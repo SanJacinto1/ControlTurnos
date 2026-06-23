@@ -105,6 +105,17 @@ input, select {
   width: 100%;
 }
 
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 input[readonly] {
   background: var(--color-fondo);
   color: var(--color-neutro);
@@ -306,18 +317,26 @@ button {
   gap: 16px;
 }
 
+@media (max-width: 480px) {
+  .detalle-grid {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
 .detalle-fila {
   display: grid;
-  grid-template-columns: 50px 1fr 70px;
+  grid-template-columns: 56px minmax(64px, 1fr) 64px;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin-bottom: 6px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
 .detalle-fila input {
-  padding: 4px 6px;
+  padding: 6px 4px;
   text-align: center;
+  min-width: 0;
 }
 
 .detalle-fila .subtotal {
