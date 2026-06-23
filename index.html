@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E/S San Jacinto - Control de Turno</title>
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1b6b3d">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <img src="logo.svg" alt="E/S San Jacinto" class="logo">
+  <h1>San Jacinto</h1>
+  <p class="subtitulo">Control Diario de Ventas (Turno)</p>
+</header>
+
+<main>
+
+  <!-- Vista: registro de nombre (primera vez) -->
+  <div id="vistaSetup" class="hidden">
+    <section class="card">
+      <h2>¿Cómo te llamas?</h2>
+      <p class="hint">Regístrate una sola vez en este celular. Tu nombre quedará guardado para todos tus turnos y anticipos.</p>
+      <div class="grid grid-2">
+        <label>Nombre del despachador
+          <input type="text" id="setupNombre" placeholder="Tu nombre">
+        </label>
+      </div>
+      <button type="button" id="btnGuardarPerfil">Continuar</button>
+    </section>
+  </div>
+
+  <!-- Vista: dashboard de inicio -->
+  <div id="vistaDashboard" class="hidden">
+    <section class="card">
+      <h2 id="saludoDashboard">Hola</h2>
+      <p class="hint">Resumen del mes actual</p>
+      <div class="dashboard-resumen">
+        <div class="dashboard-tarjeta">
+          <span>Sobra / falta del mes</span>
+          <strong id="dashSobraFalta">$0.00</strong>
+        </div>
+        <div class="dashboard-tarjeta">
+          <span>Anticipos del mes</span>
+          <strong id="dashAnticipos">$0.00</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="card botones-finales">
+      <button type="button" id="btnIrTurno">Registrar turno</button>
+      <button type="button" id="btnVerHistorial" class="btn-secundario">Ver turnos del mes</button>
+      <button type="button" id="btnAnticipos" class="btn-secundario">Anticipos</button>
+      <button type="button" id="btnCambiarPerfil" class="btn-secundario">Cambiar de usuario</button>
+    </section>
+  </div>
+
+  <!-- Vista: formulario de turno -->
+  <div id="vistaTurno" class="hidden">
+    <button type="button" id="btnVolverDashboard" class="btn-volver">← Volver al inicio</button>
+
+    <section class="card">
+      <h2>Datos del turno</h2>
+      <div class="grid grid-3">
+        <label>Fecha
+          <input type="date" id="fecha">
+        </label>
+        <label>Turno
+          <select id="turno">
+            <option value="">--</option>
+            <option value="Día">Día</option>
+            <option value="Noche">Noche</option>
+          </select>
+        </label>
+        <label>Nombre
+          <input type="text" id="nombre" readonly>
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Ventas de combustible</h2>
+      <div class="grid grid-2">
+        <label>Total ventas del turno (ticket del sistema)
+          <input type="number" inputmode="decimal" step="0.01" id="totalVentas" placeholder="0.00">
+        </label>
+      </div>
+
+      <h3>Cobrado</h3>
+      <div class="grid grid-2">
+        <label>Efectivo
+          <span class="input-with-btn">
+            <input type="number" inputmode="decimal" step="0.01" id="efectivo" placeholder="0.00">
+            <button type="button" id="btnDetalleEfectivo" title="Detalle de billetes y monedas">🧮</button>
+          </span>
+        </label>
+        <label>Créditos
+          <input type="number" inputmode="decimal" step="0.01" id="creditos" placeholder="0.00">
+        </label>
+        <label>Tarjetas
+          <span class="input-with-btn">
+            <input type="number" inputmode="decimal" step="0.01" id="tarjetas" placeholder="0.00">
+            <button type="button" id="btnDetalleTarjetas" title="Registrar tarjetas una por una">🧮</button>
+          </span>
+        </label>
+        <label>Transferencias
+          <span class="input-with-btn">
+            <input type="number" inputmode="decimal" step="0.01" id="transferencias" placeholder="0.00">
+            <button type="button" id="btnDetalleTransferencias" title="Registrar transferencias una por una">🧮</button>
+          </span>
+        </label>
+        <label>Cheques
+          <input type="number" inputmode="decimal" step="0.01" id="cheques" placeholder="0.00">
+        </label>
+      </div>
+
+      <div class="resultado">
+        <div class="resultado-fila">
+          <span>Total cobrado</span>
+          <strong id="resTotalCobrado">$0.00</strong>
+        </div>
+        <div class="resultado-fila">
+          <span>Diferencia combustible (cobrado − ventas)</span>
+          <strong id="resDiferenciaCombustible">$0.00</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Aceites</h2>
+      <div class="grid grid-2">
+        <label>Venta de aceites del turno
+          <input type="number" inputmode="decimal" step="0.01" id="ventaAceites" placeholder="0.00">
+        </label>
+      </div>
+      <p class="hint">El dinero de aceites ya está incluido en el efectivo recibido, por eso se resta para calcular la sobra/falta final.</p>
+    </section>
+
+    <section class="card resultado-final">
+      <h2>Resultado del turno</h2>
+      <div id="resultadoFinal" class="resultado-grande">$0.00</div>
+      <div id="resultadoEtiqueta" class="resultado-etiqueta">SOBRA</div>
+      <div id="alertaFaltante" class="alerta-faltante hidden">
+        ⚠️ RECOMENDACIÓN: revisar bien las transferencias, los pedidos, los créditos y el efectivo.
+      </div>
+    </section>
+
+    <section class="card botones-finales">
+      <button type="button" id="btnGuardar">Guardar turno</button>
+      <button type="button" id="btnCompartir" class="btn-secundario">Compartir turno</button>
+      <button type="button" id="btnCargarUltimo" class="btn-secundario">Cargar último turno guardado</button>
+      <button type="button" id="btnLimpiar" class="btn-secundario">Limpiar turno</button>
+    </section>
+  </div>
+
+</main>
+
+<!-- Modal detalle de efectivo -->
+<div id="modalEfectivo" class="modal-overlay hidden">
+  <div class="modal">
+    <h2>Detalle de efectivo</h2>
+    <div class="detalle-grid">
+      <div>
+        <h3>Billetes</h3>
+        <div class="detalle-fila" data-valor="100"><span>$100</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+        <div class="detalle-fila" data-valor="50"><span>$50</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+        <div class="detalle-fila" data-valor="20"><span>$20</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+        <div class="detalle-fila" data-valor="10"><span>$10</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+        <div class="detalle-fila" data-valor="5"><span>$5</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+        <div class="detalle-fila" data-valor="1"><span>$1</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+      </div>
+      <div>
+        <h3>Monedas</h3>
+        <div class="detalle-fila" data-valor="1"><span>$1.00</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+        <div class="detalle-fila" data-valor="0.50"><span>$0.50</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+        <div class="detalle-fila" data-valor="0.25"><span>$0.25</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+        <div class="detalle-fila" data-valor="0.10"><span>$0.10</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+        <div class="detalle-fila" data-valor="0.05"><span>$0.05</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+        <div class="detalle-fila" data-valor="0.01"><span>$0.01</span><input type="number" min="0" step="1" value="0"><span class="subtotal">$0.00</span></div>
+      </div>
+    </div>
+    <div class="modal-total">
+      Total: <strong id="detalleTotal">$0.00</strong>
+    </div>
+    <div class="modal-botones">
+      <button type="button" id="btnCancelarDetalle" class="btn-secundario">Cancelar</button>
+      <button type="button" id="btnUsarDetalle">Usar este total</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal detalle de tarjetas -->
+<div id="modalTarjetas" class="modal-overlay hidden">
+  <div class="modal">
+    <h2>Detalle de tarjetas</h2>
+    <p class="hint">Registra cada cobro con tarjeta (referencia y valor) a medida que ocurren en el turno, o simplemente escribe el total directo en el campo "Tarjetas" si no quieres registrar uno por uno.</p>
+    <div class="grid grid-2">
+      <label>N° de referencia
+        <input type="text" id="tarjetaReferencia" placeholder="Referencia">
+      </label>
+      <label>Valor
+        <input type="number" inputmode="decimal" step="0.01" id="tarjetaValor" placeholder="0.00">
+      </label>
+    </div>
+    <button type="button" id="btnAgregarTarjeta">Agregar</button>
+
+    <div id="listaTarjetas" class="lista-historial">
+      <p class="hint">Todavía no hay tarjetas registradas en este turno.</p>
+    </div>
+    <div id="totalTarjetas" class="modal-total"></div>
+    <div class="modal-botones">
+      <button type="button" id="btnCerrarTarjetas" class="btn-secundario">Cerrar</button>
+      <button type="button" id="btnUsarTarjetas">Usar este total</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal detalle de transferencias -->
+<div id="modalTransferencias" class="modal-overlay hidden">
+  <div class="modal">
+    <h2>Detalle de transferencias</h2>
+    <p class="hint">Registra cada transferencia (referencia y valor) a medida que ocurren en el turno, o simplemente escribe el total directo en el campo "Transferencias" si no quieres registrar una por una.</p>
+    <div class="grid grid-2">
+      <label>N° de referencia
+        <input type="text" id="transferenciaReferencia" placeholder="Referencia">
+      </label>
+      <label>Valor
+        <input type="number" inputmode="decimal" step="0.01" id="transferenciaValor" placeholder="0.00">
+      </label>
+    </div>
+    <button type="button" id="btnAgregarTransferencia">Agregar</button>
+
+    <div id="listaTransferencias" class="lista-historial">
+      <p class="hint">Todavía no hay transferencias registradas en este turno.</p>
+    </div>
+    <div id="totalTransferencias" class="modal-total"></div>
+    <div class="modal-botones">
+      <button type="button" id="btnCerrarTransferencias" class="btn-secundario">Cerrar</button>
+      <button type="button" id="btnUsarTransferencias">Usar este total</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal historial de turnos -->
+<div id="modalHistorial" class="modal-overlay hidden">
+  <div class="modal">
+    <h2>Turnos del mes</h2>
+    <label>Mes
+      <input type="month" id="mesHistorial">
+    </label>
+    <div id="listaHistorial" class="lista-historial">
+      <p class="hint">Todavía no hay turnos guardados.</p>
+    </div>
+    <div id="totalMes" class="modal-total"></div>
+    <div class="modal-botones">
+      <button type="button" id="btnCerrarHistorial" class="btn-secundario">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal anticipos -->
+<div id="modalAnticipos" class="modal-overlay hidden">
+  <div class="modal">
+    <h2>Anticipos</h2>
+    <div class="grid grid-2">
+      <label>Fecha
+        <input type="date" id="anticipoFecha">
+      </label>
+      <label>Empleado
+        <input type="text" id="anticipoNombre">
+      </label>
+      <label>Monto
+        <input type="number" inputmode="decimal" step="0.01" id="anticipoMonto" placeholder="0.00">
+      </label>
+      <label>Concepto (opcional)
+        <input type="text" id="anticipoConcepto" placeholder="Motivo">
+      </label>
+    </div>
+    <button type="button" id="btnAgregarAnticipo">Agregar anticipo</button>
+
+    <div id="listaAnticipos" class="lista-historial">
+      <p class="hint">Todavía no hay anticipos registrados.</p>
+    </div>
+    <div id="totalAnticipos" class="modal-total"></div>
+    <div class="modal-botones">
+      <button type="button" id="btnCerrarAnticipos" class="btn-secundario">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script src="logic.js"></script>
+<script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+</body>
+</html>

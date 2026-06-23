@@ -1,0 +1,12 @@
+{
+  "name": "E/S San Jacinto - Control de Turno",
+  "short_name": "Control Turno",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#1b6b3d",
+  "icons": [
+    { "src": "logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

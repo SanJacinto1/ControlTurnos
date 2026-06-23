@@ -1,0 +1,10 @@
+<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+  <g fill="#1b6b3d">
+    <path d="M70 50 h60 a10 10 0 0 1 10 10 v90 a14 14 0 0 1 -14 14 h-2 v8 a8 8 0 0 1 -8 8 h-46 a8 8 0 0 1 -8 -8 v-104 a10 10 0 0 1 10 -10 z"/>
+    <rect x="78" y="62" width="38" height="36" rx="4" fill="#ffffff"/>
+    <path d="M140 56 l28 -22 a8 8 0 0 1 11 1 a8 8 0 0 1 -1 11 l-22 18 z"/>
+    <path d="M132 64 h14 a6 6 0 0 1 6 6 v36 a8 8 0 0 1 -8 8 h-4 a8 8 0 0 1 -8 -8 v-36 a6 6 0 0 1 6 -6 z"/>
+  </g>
+  <path d="M170 78 c0 12 -10 18 -10 30 a10 10 0 0 0 20 0 c0 -12 -10 -18 -10 -30 z" fill="#d4a017"/>
+  <text x="100" y="205" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="26" letter-spacing="1" fill="#1b6b3d">E/S SAN JACINTO</text>
+</svg>
