@@ -304,6 +304,27 @@ input[readonly] {
   cursor: pointer;
 }
 
+.vale-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 32px;
+  gap: 6px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.vale-item input {
+  padding: 8px 6px;
+}
+
+.vale-item .btn-quitar-item {
+  background: none;
+  border: none;
+  color: var(--color-negativo);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0;
+}
+
 button {
   background: var(--color-acento);
   color: white;

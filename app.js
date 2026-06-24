@@ -7,6 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
+const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
 
@@ -358,6 +359,116 @@ function cerrarModalAnticipos() {
   mostrarDashboard();
 }
 
+// --- Vale de caja (conectado al Google Sheet existente) ---
+
+function filaVacíaVale() {
+  const fila = document.createElement('div');
+  fila.className = 'vale-item';
+  fila.innerHTML = `
+    <input type="text" class="vale-descripcion" placeholder="Descripción">
+    <input type="number" class="vale-valor" inputmode="decimal" step="0.01" min="0" placeholder="0.00">
+    <button type="button" class="btn-quitar-item" title="Quitar">✕</button>
+  `;
+  fila.querySelector('.btn-quitar-item').addEventListener('click', () => {
+    fila.remove();
+    actualizarTotalVale();
+  });
+  fila.querySelector('.vale-valor').addEventListener('input', actualizarTotalVale);
+  return fila;
+}
+
+function actualizarTotalVale() {
+  let total = 0;
+  document.querySelectorAll('#valeItems .vale-valor').forEach(input => {
+    total += parseFloat(input.value) || 0;
+  });
+  document.getElementById('valeTotal').textContent = formatoMoneda(total);
+  return total;
+}
+
+function mostrarVale() {
+  const perfil = leerPerfil();
+  document.getElementById('valeCliente').value = '';
+  document.getElementById('valeElaborado').value = perfil ? perfil.nombre : '';
+  document.getElementById('valeEstado').textContent = '';
+  document.getElementById('valeProximoNumero').textContent = '#...';
+
+  const contenedor = document.getElementById('valeItems');
+  contenedor.innerHTML = '';
+  contenedor.appendChild(filaVacíaVale());
+  actualizarTotalVale();
+
+  document.getElementById('modalVale').classList.remove('hidden');
+}
+
+function cerrarModalVale() {
+  document.getElementById('modalVale').classList.add('hidden');
+}
+
+async function generarVale() {
+  const cliente = document.getElementById('valeCliente').value.trim();
+  const elaborado = document.getElementById('valeElaborado').value.trim();
+  const items = Array.from(document.querySelectorAll('#valeItems .vale-item')).map(fila => ({
+    descripcion: fila.querySelector('.vale-descripcion').value.trim(),
+    valor: parseFloat(fila.querySelector('.vale-valor').value),
+  }));
+
+  if (!cliente) {
+    alert('Ingresa el nombre del cliente.');
+    return;
+  }
+  if (items.length === 0 || items.some(item => !item.descripcion || isNaN(item.valor) || item.valor <= 0)) {
+    alert('Cada item necesita descripción y un valor válido.');
+    return;
+  }
+
+  const total = actualizarTotalVale();
+  const datos = { cliente, elaborado, total, items };
+
+  const botonGenerar = document.getElementById('btnGenerarVale');
+  const estadoEl = document.getElementById('valeEstado');
+  botonGenerar.disabled = true;
+  botonGenerar.textContent = 'Procesando...';
+  estadoEl.textContent = '';
+
+  const ventanaTicket = window.open('', '_blank');
+  if (ventanaTicket) {
+    ventanaTicket.document.write('<p style="font-family:sans-serif;padding:20px;">Generando recibo...</p>');
+  }
+
+  try {
+    const respuesta = await fetch(VALE_APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(datos),
+    });
+    const resultado = await respuesta.json();
+
+    if (!resultado.ok) throw new Error(resultado.error || 'Error desconocido');
+
+    if (ventanaTicket) {
+      ventanaTicket.document.open();
+      ventanaTicket.document.write(resultado.ticketHTML);
+      ventanaTicket.document.close();
+    }
+
+    estadoEl.textContent = `Recibo #${resultado.numeroRecibo} generado correctamente.`;
+    document.getElementById('valeCliente').value = '';
+    const contenedor = document.getElementById('valeItems');
+    contenedor.innerHTML = '';
+    contenedor.appendChild(filaVacíaVale());
+    actualizarTotalVale();
+    document.getElementById('valeProximoNumero').textContent = '#' + (resultado.numeroRecibo + 1);
+  } catch (err) {
+    if (ventanaTicket) ventanaTicket.close();
+    estadoEl.textContent = '';
+    alert('No se pudo generar el recibo: ' + err.message);
+  } finally {
+    botonGenerar.disabled = false;
+    botonGenerar.textContent = 'Generar e imprimir';
+  }
+}
+
 // --- Compartir turno ---
 
 function construirMensajeTurno() {
@@ -408,6 +519,86 @@ async function compartirTurno() {
   }
 
   window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+}
+
+// --- Imprimir turno (ticket angosto, para impresoras de recibos) ---
+
+function construirTicketHTML() {
+  const datos = {
+    fecha: document.getElementById('fecha').value || '(sin fecha)',
+    turno: document.getElementById('turno').value || '(sin turno)',
+    nombre: document.getElementById('nombre').value || '(sin nombre)',
+    totalVentas: num('totalVentas'),
+    efectivo: num('efectivo'),
+    creditos: num('creditos'),
+    tarjetas: num('tarjetas'),
+    transferencias: num('transferencias'),
+    cheques: num('cheques'),
+    ventaAceites: num('ventaAceites'),
+  };
+  const { totalCobrado, resultadoFinal } = calcularTurno(datos);
+  const { texto } = etiquetaResultado(resultadoFinal);
+  const horaImpresion = new Date().toLocaleString('es-EC');
+
+  const filas = [
+    ['Total ventas', formatoMoneda(datos.totalVentas)],
+    ['Efectivo', formatoMoneda(datos.efectivo)],
+    ['Créditos', formatoMoneda(datos.creditos)],
+    ['Tarjetas', formatoMoneda(datos.tarjetas)],
+    ['Transferencias', formatoMoneda(datos.transferencias)],
+    ['Cheques', formatoMoneda(datos.cheques)],
+    ['Total cobrado', formatoMoneda(totalCobrado)],
+    ['Venta aceites', formatoMoneda(datos.ventaAceites)],
+  ].map(([etiqueta, valor]) => `<div class="fila"><span>${etiqueta}</span><span>${valor}</span></div>`).join('');
+
+  return `
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Ticket de turno</title>
+      <style>
+        @page { size: 80mm auto; margin: 0; }
+        body { margin: 0; font-family: 'Courier New', monospace; font-size: 13px; }
+        .ticket { width: 78mm; padding: 6mm 4mm; box-sizing: border-box; }
+        h2 { text-align: center; margin: 0 0 4px; font-size: 15px; }
+        .centrado { text-align: center; margin: 0 0 8px; }
+        .linea { border-top: 1px dashed #000; margin: 8px 0; }
+        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
+        .resultado { text-align: center; margin-top: 10px; font-size: 15px; font-weight: bold; }
+        .pie { text-align: center; margin-top: 12px; font-size: 11px; }
+        @media print { body { margin: 0; } }
+      </style>
+    </head>
+    <body>
+      <div class="ticket">
+        <h2>E/S SAN JACINTO</h2>
+        <p class="centrado">Control de Turno</p>
+        <div class="linea"></div>
+        <div class="fila"><span>Fecha</span><span>${datos.fecha}</span></div>
+        <div class="fila"><span>Turno</span><span>${datos.turno}</span></div>
+        <div class="fila"><span>Despachador</span><span>${datos.nombre}</span></div>
+        <div class="linea"></div>
+        ${filas}
+        <div class="linea"></div>
+        <div class="resultado">${formatoMoneda(resultadoFinal)} ${texto}</div>
+        <div class="pie">Impreso: ${horaImpresion}</div>
+      </div>
+      <script>
+        window.onload = function() {
+          window.print();
+          window.onafterprint = function() { window.close(); };
+          setTimeout(function() { window.close(); }, 10000);
+        };
+      </script>
+    </body>
+    </html>
+  `;
+}
+
+function imprimirTurno() {
+  const ventana = window.open('', '_blank');
+  ventana.document.write(construirTicketHTML());
+  ventana.document.close();
 }
 
 // --- Detalle de tarjetas y transferencias (registro uno por uno) ---
@@ -549,10 +740,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnCargarUltimo').addEventListener('click', cargarUltimoTurno);
   document.getElementById('btnGuardar').addEventListener('click', guardarTurno);
   document.getElementById('btnCompartir').addEventListener('click', compartirTurno);
+  document.getElementById('btnImprimir').addEventListener('click', imprimirTurno);
   document.getElementById('btnVerHistorial').addEventListener('click', mostrarHistorial);
   document.getElementById('btnCerrarHistorial').addEventListener('click', cerrarModalHistorial);
   document.getElementById('mesHistorial').addEventListener('change', renderizarHistorialDelMes);
   document.getElementById('btnAnticipos').addEventListener('click', mostrarAnticipos);
+  document.getElementById('btnVale').addEventListener('click', mostrarVale);
+  document.getElementById('btnCerrarVale').addEventListener('click', cerrarModalVale);
+  document.getElementById('btnAgregarItemVale').addEventListener('click', () => {
+    document.getElementById('valeItems').appendChild(filaVacíaVale());
+  });
+  document.getElementById('btnGenerarVale').addEventListener('click', generarVale);
   document.getElementById('btnCerrarAnticipos').addEventListener('click', cerrarModalAnticipos);
   document.getElementById('btnAgregarAnticipo').addEventListener('click', agregarAnticipo);
   document.getElementById('btnDetalleEfectivo').addEventListener('click', abrirModalEfectivo);

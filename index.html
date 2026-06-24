@@ -58,6 +58,7 @@
       <button type="button" id="btnIrTurno">Registrar turno</button>
       <button type="button" id="btnVerHistorial" class="btn-secundario">Ver turnos del mes</button>
       <button type="button" id="btnAnticipos" class="btn-secundario">Anticipos</button>
+      <button type="button" id="btnVale" class="btn-secundario">Vale de caja</button>
       <button type="button" id="btnCambiarPerfil" class="btn-secundario">Cambiar de usuario</button>
     </section>
   </div>
@@ -153,6 +154,7 @@
     <section class="card botones-finales">
       <button type="button" id="btnGuardar">Guardar turno</button>
       <button type="button" id="btnCompartir" class="btn-secundario">Compartir turno</button>
+      <button type="button" id="btnImprimir" class="btn-secundario">Imprimir turno</button>
       <button type="button" id="btnCargarUltimo" class="btn-secundario">Cargar último turno guardado</button>
       <button type="button" id="btnLimpiar" class="btn-secundario">Limpiar turno</button>
     </section>
@@ -289,6 +291,38 @@
     <div id="totalAnticipos" class="modal-total"></div>
     <div class="modal-botones">
       <button type="button" id="btnCerrarAnticipos" class="btn-secundario">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal vale de caja -->
+<div id="modalVale" class="modal-overlay hidden">
+  <div class="modal">
+    <h2>Vale de caja</h2>
+    <p class="hint">Próximo recibo: <strong id="valeProximoNumero">#...</strong></p>
+
+    <div class="grid grid-2">
+      <label>Cliente
+        <input type="text" id="valeCliente" placeholder="Nombre del cliente">
+      </label>
+      <label>Elaborado por
+        <input type="text" id="valeElaborado" readonly>
+      </label>
+    </div>
+
+    <h3>Detalle</h3>
+    <div id="valeItems"></div>
+    <button type="button" id="btnAgregarItemVale" class="btn-secundario">+ Agregar item</button>
+
+    <div class="modal-total">
+      Total: <strong id="valeTotal">$0.00</strong>
+    </div>
+
+    <div id="valeEstado" class="hint"></div>
+
+    <div class="modal-botones">
+      <button type="button" id="btnCerrarVale" class="btn-secundario">Cerrar</button>
+      <button type="button" id="btnGenerarVale">Generar e imprimir</button>
     </div>
   </div>
 </div>
