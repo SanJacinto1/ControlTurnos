@@ -149,6 +149,38 @@ function mostrarVista(idVista) {
   document.querySelector('header').classList.toggle('compacto', idVista !== 'vistaDashboard');
 }
 
+// --- Historial del navegador: que el botón "Atrás" cierre modales/vistas en vez de salir ---
+
+const MODALES = ['modalEfectivo', 'modalTarjetas', 'modalTransferencias', 'modalHistorial', 'modalAnticipos', 'modalVale'];
+
+function irAEstado(estado) {
+  history.pushState(estado, '');
+  aplicarEstado(estado);
+}
+
+function cerrarEstadoActual() {
+  history.back();
+}
+
+function aplicarEstado(estado) {
+  estado = estado || { pantalla: 'dashboard' };
+
+  if (estado.pantalla === 'turno') {
+    mostrarVista('vistaTurno');
+  } else {
+    mostrarDashboard();
+  }
+
+  MODALES.forEach(id => document.getElementById(id).classList.add('hidden'));
+  if (estado.modal) {
+    document.getElementById(estado.modal).classList.remove('hidden');
+  }
+}
+
+window.addEventListener('popstate', event => {
+  aplicarEstado(event.state);
+});
+
 function mostrarDashboard() {
   const perfil = leerPerfil();
   if (!perfil) {
@@ -189,7 +221,7 @@ function mostrarVistaTurno() {
     document.getElementById('fecha').value = new Date().toISOString().slice(0, 10);
   }
   recalcular();
-  mostrarVista('vistaTurno');
+  irAEstado({ pantalla: 'turno' });
 }
 
 // --- Historial de turnos (por mes) ---
@@ -220,7 +252,7 @@ function guardarTurno() {
 
   alert('Turno guardado.');
   limpiarCamposTurno();
-  mostrarDashboard();
+  cerrarEstadoActual();
 }
 
 function etiquetaResultado(resultadoFinal) {
@@ -269,11 +301,11 @@ function mostrarHistorial() {
     mesInput.value = new Date().toISOString().slice(0, 7);
   }
   renderizarHistorialDelMes();
-  document.getElementById('modalHistorial').classList.remove('hidden');
+  irAEstado({ pantalla: 'dashboard', modal: 'modalHistorial' });
 }
 
 function cerrarModalHistorial() {
-  document.getElementById('modalHistorial').classList.add('hidden');
+  cerrarEstadoActual();
 }
 
 // --- Anticipos ---
@@ -351,17 +383,16 @@ function mostrarAnticipos() {
   const perfil = leerPerfil();
   document.getElementById('anticipoNombre').value = perfil ? perfil.nombre : '';
   renderizarAnticipos();
-  document.getElementById('modalAnticipos').classList.remove('hidden');
+  irAEstado({ pantalla: 'dashboard', modal: 'modalAnticipos' });
 }
 
 function cerrarModalAnticipos() {
-  document.getElementById('modalAnticipos').classList.add('hidden');
-  mostrarDashboard();
+  cerrarEstadoActual();
 }
 
 // --- Vale de caja (conectado al Google Sheet existente) ---
 
-function filaVacíaVale() {
+function filaVaciaVale() {
   const fila = document.createElement('div');
   fila.className = 'vale-item';
   fila.innerHTML = `
@@ -395,14 +426,14 @@ function mostrarVale() {
 
   const contenedor = document.getElementById('valeItems');
   contenedor.innerHTML = '';
-  contenedor.appendChild(filaVacíaVale());
+  contenedor.appendChild(filaVaciaVale());
   actualizarTotalVale();
 
-  document.getElementById('modalVale').classList.remove('hidden');
+  irAEstado({ pantalla: 'dashboard', modal: 'modalVale' });
 }
 
 function cerrarModalVale() {
-  document.getElementById('modalVale').classList.add('hidden');
+  cerrarEstadoActual();
 }
 
 async function generarVale() {
@@ -456,7 +487,7 @@ async function generarVale() {
     document.getElementById('valeCliente').value = '';
     const contenedor = document.getElementById('valeItems');
     contenedor.innerHTML = '';
-    contenedor.appendChild(filaVacíaVale());
+    contenedor.appendChild(filaVaciaVale());
     actualizarTotalVale();
     document.getElementById('valeProximoNumero').textContent = '#' + (resultado.numeroRecibo + 1);
   } catch (err) {
@@ -677,11 +708,11 @@ function renderizarEntradasDetalle(tipo) {
 
 function abrirModalDetalle(tipo) {
   renderizarEntradasDetalle(tipo);
-  document.getElementById(CONFIG_DETALLE[tipo].modalId).classList.remove('hidden');
+  irAEstado({ pantalla: 'turno', modal: CONFIG_DETALLE[tipo].modalId });
 }
 
 function cerrarModalDetalle(tipo) {
-  document.getElementById(CONFIG_DETALLE[tipo].modalId).classList.add('hidden');
+  cerrarEstadoActual();
 }
 
 function usarTotalDetalle(tipo) {
@@ -707,12 +738,12 @@ function recalcularDetalleEfectivo() {
 }
 
 function abrirModalEfectivo() {
-  document.getElementById('modalEfectivo').classList.remove('hidden');
+  irAEstado({ pantalla: 'turno', modal: 'modalEfectivo' });
   recalcularDetalleEfectivo();
 }
 
 function cerrarModalEfectivo() {
-  document.getElementById('modalEfectivo').classList.add('hidden');
+  cerrarEstadoActual();
 }
 
 function usarDetalleEfectivo() {
@@ -734,7 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnGuardarPerfil').addEventListener('click', guardarPerfil);
   document.getElementById('btnCambiarPerfil').addEventListener('click', cambiarPerfil);
   document.getElementById('btnIrTurno').addEventListener('click', mostrarVistaTurno);
-  document.getElementById('btnVolverDashboard').addEventListener('click', mostrarDashboard);
+  document.getElementById('btnVolverDashboard').addEventListener('click', cerrarEstadoActual);
 
   document.getElementById('btnLimpiar').addEventListener('click', limpiarTurno);
   document.getElementById('btnCargarUltimo').addEventListener('click', cargarUltimoTurno);
@@ -748,7 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnVale').addEventListener('click', mostrarVale);
   document.getElementById('btnCerrarVale').addEventListener('click', cerrarModalVale);
   document.getElementById('btnAgregarItemVale').addEventListener('click', () => {
-    document.getElementById('valeItems').appendChild(filaVacíaVale());
+    document.getElementById('valeItems').appendChild(filaVaciaVale());
   });
   document.getElementById('btnGenerarVale').addEventListener('click', generarVale);
   document.getElementById('btnCerrarAnticipos').addEventListener('click', cerrarModalAnticipos);

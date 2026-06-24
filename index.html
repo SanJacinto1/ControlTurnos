@@ -330,6 +330,9 @@
 <script src="logic.js"></script>
 <script src="app.js"></script>
 <script>
+  window.addEventListener('error', function (e) {
+    alert('Error en la app: ' + e.message + '\n(línea ' + e.lineno + ' de ' + (e.filename || '').split('/').pop() + ')');
+  });
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').then(registro => {
       const haySWActivoPrevio = !!navigator.serviceWorker.controller;
