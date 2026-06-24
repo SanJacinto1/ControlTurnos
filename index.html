@@ -332,12 +332,13 @@
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').then(registro => {
+      const haySWActivoPrevio = !!navigator.serviceWorker.controller;
       registro.update();
       registro.addEventListener('updatefound', () => {
         const nuevo = registro.installing;
         if (!nuevo) return;
         nuevo.addEventListener('statechange', () => {
-          if (nuevo.state === 'activated') {
+          if (nuevo.state === 'activated' && haySWActivoPrevio) {
             window.location.reload();
           }
         });
