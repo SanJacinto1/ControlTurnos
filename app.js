@@ -462,11 +462,6 @@ async function generarVale() {
   botonGenerar.textContent = 'Procesando...';
   estadoEl.textContent = '';
 
-  const ventanaTicket = window.open('', '_blank');
-  if (ventanaTicket) {
-    ventanaTicket.document.write('<p style="font-family:sans-serif;padding:20px;">Generando recibo...</p>');
-  }
-
   try {
     const respuesta = await fetch(VALE_APPS_SCRIPT_URL, {
       method: 'POST',
@@ -477,11 +472,7 @@ async function generarVale() {
 
     if (!resultado.ok) throw new Error(resultado.error || 'Error desconocido');
 
-    if (ventanaTicket) {
-      ventanaTicket.document.open();
-      ventanaTicket.document.write(resultado.ticketHTML);
-      ventanaTicket.document.close();
-    }
+    imprimirHTML(resultado.ticketHTML);
 
     estadoEl.textContent = `Recibo #${resultado.numeroRecibo} generado correctamente.`;
     document.getElementById('valeCliente').value = '';
@@ -491,7 +482,6 @@ async function generarVale() {
     actualizarTotalVale();
     document.getElementById('valeProximoNumero').textContent = '#' + (resultado.numeroRecibo + 1);
   } catch (err) {
-    if (ventanaTicket) ventanaTicket.close();
     estadoEl.textContent = '';
     alert('No se pudo generar el recibo: ' + err.message);
   } finally {
@@ -612,22 +602,26 @@ function construirTicketHTML() {
         <div class="resultado">${formatoMoneda(resultadoFinal)} ${texto}</div>
         <div class="pie">Impreso: ${horaImpresion}</div>
       </div>
-      <script>
-        window.onload = function() {
-          window.print();
-          window.onafterprint = function() { window.close(); };
-          setTimeout(function() { window.close(); }, 10000);
-        };
-      </script>
     </body>
     </html>
   `;
 }
 
+function imprimirHTML(htmlCompleto) {
+  const areaImpresion = document.getElementById('areaImpresion');
+  const estiloMatch = htmlCompleto.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+  const cuerpoMatch = htmlCompleto.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+  const estilo = estiloMatch ? `<style>${estiloMatch[1]}</style>` : '';
+  let cuerpo = cuerpoMatch ? cuerpoMatch[1] : htmlCompleto;
+  cuerpo = cuerpo.replace(/<script[\s\S]*?<\/script>/gi, '');
+
+  areaImpresion.innerHTML = estilo + cuerpo;
+  window.print();
+  setTimeout(() => { areaImpresion.innerHTML = ''; }, 1000);
+}
+
 function imprimirTurno() {
-  const ventana = window.open('', '_blank');
-  ventana.document.write(construirTicketHTML());
-  ventana.document.close();
+  imprimirHTML(construirTicketHTML());
 }
 
 // --- Detalle de tarjetas y transferencias (registro uno por uno) ---

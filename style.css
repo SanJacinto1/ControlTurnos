@@ -15,6 +15,13 @@
 
 .hidden { display: none; }
 
+#areaImpresion { display: none; }
+
+@media print {
+  body > *:not(#areaImpresion) { display: none !important; }
+  #areaImpresion { display: block !important; }
+}
+
 body {
   margin: 0;
   font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
