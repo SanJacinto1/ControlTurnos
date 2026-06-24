@@ -578,9 +578,8 @@ function construirTicketHTML() {
       <meta charset="UTF-8">
       <title>Ticket de turno</title>
       <style>
-        @page { size: 4in 6in; margin: 0.2in; }
-        body { margin: 0; padding: 0; font-family: 'Courier New', monospace; font-size: 13px; }
-        .ticket { width: 100%; }
+        body { margin: 0; padding: 20px; font-family: 'Courier New', monospace; font-size: 13px; }
+        .ticket { max-width: 320px; margin: 0 auto; }
         h2 { text-align: center; margin: 0 0 4px; font-size: 15px; }
         .centrado { text-align: center; margin: 0 0 8px; }
         .linea { border-top: 1px dashed #000; margin: 8px 0; }
