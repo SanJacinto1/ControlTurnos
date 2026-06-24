@@ -282,6 +282,15 @@ input[readonly] {
   color: var(--color-neutro);
 }
 
+.dashboard-total {
+  margin-top: 12px;
+  background: var(--color-fondo);
+}
+
+.dashboard-total strong {
+  font-size: 1.6rem;
+}
+
 .dashboard-tarjeta strong {
   font-size: 1.3rem;
 }

@@ -171,6 +171,13 @@ function mostrarDashboard() {
   const sumaAnticipos = anticiposDelMes.reduce((total, a) => total + a.monto, 0);
   document.getElementById('dashAnticipos').textContent = formatoMoneda(sumaAnticipos);
 
+  const total = sumaSobraFalta + sumaAnticipos;
+  const { clase: claseTotal } = etiquetaResultado(total);
+  const totalEl = document.getElementById('dashTotal');
+  totalEl.textContent = formatoMoneda(total);
+  totalEl.classList.remove('positivo', 'negativo', 'neutro');
+  totalEl.classList.add(claseTotal);
+
   mostrarVista('vistaDashboard');
 }
 
@@ -348,6 +355,7 @@ function mostrarAnticipos() {
 
 function cerrarModalAnticipos() {
   document.getElementById('modalAnticipos').classList.add('hidden');
+  mostrarDashboard();
 }
 
 // --- Compartir turno ---
