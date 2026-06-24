@@ -578,14 +578,14 @@ function construirTicketHTML() {
       <meta charset="UTF-8">
       <title>Ticket de turno</title>
       <style>
-        body { margin: 0; padding: 20px; font-family: 'Courier New', monospace; font-size: 13px; }
-        .ticket { max-width: 320px; margin: 0 auto; }
-        h2 { text-align: center; margin: 0 0 4px; font-size: 15px; }
-        .centrado { text-align: center; margin: 0 0 8px; }
+        body { margin: 0; padding: 8px; font-family: 'Courier New', monospace; font-size: 17px; font-weight: bold; }
+        .ticket { width: 100%; max-width: 360px; margin: 0 auto; }
+        h2 { text-align: center; margin: 0 0 4px; font-size: 20px; }
+        .centrado { text-align: center; margin: 0 0 10px; font-size: 15px; }
         .linea { border-top: 1px dashed #000; margin: 8px 0; }
-        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
-        .resultado { text-align: center; margin-top: 10px; font-size: 15px; font-weight: bold; }
-        .pie { text-align: center; margin-top: 12px; font-size: 11px; }
+        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; }
+        .resultado { text-align: center; margin-top: 12px; font-size: 20px; font-weight: bold; }
+        .pie { text-align: center; margin-top: 14px; font-size: 13px; }
       </style>
     </head>
     <body>
