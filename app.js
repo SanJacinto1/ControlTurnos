@@ -578,8 +578,9 @@ function construirTicketHTML() {
       <meta charset="UTF-8">
       <title>Ticket de turno</title>
       <style>
-        body { margin: 0; padding: 20px; font-family: 'Courier New', monospace; font-size: 13px; }
-        .ticket { max-width: 320px; margin: 0 auto; }
+        @page { size: 4in 6in; margin: 0.2in; }
+        body { margin: 0; padding: 0; font-family: 'Courier New', monospace; font-size: 13px; }
+        .ticket { width: 100%; }
         h2 { text-align: center; margin: 0 0 4px; font-size: 15px; }
         .centrado { text-align: center; margin: 0 0 8px; }
         .linea { border-top: 1px dashed #000; margin: 8px 0; }
@@ -616,8 +617,10 @@ function imprimirHTML(htmlCompleto) {
   cuerpo = cuerpo.replace(/<script[\s\S]*?<\/script>/gi, '');
 
   areaImpresion.innerHTML = estilo + cuerpo;
-  window.print();
-  setTimeout(() => { areaImpresion.innerHTML = ''; }, 1000);
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => { areaImpresion.innerHTML = ''; }, 1000);
+  }, 200);
 }
 
 function imprimirTurno() {
