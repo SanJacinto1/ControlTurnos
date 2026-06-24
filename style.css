@@ -87,6 +87,7 @@ main {
 
 @media (max-width: 480px) {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .grid-fecha-turno { grid-template-columns: 1fr 1fr; gap: 8px; }
 }
 
 label {
