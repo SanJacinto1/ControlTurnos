@@ -52,6 +52,23 @@ header .subtitulo {
   opacity: 0.9;
 }
 
+header.compacto {
+  padding: 10px 20px;
+  gap: 0;
+}
+
+header.compacto .logo {
+  display: none;
+}
+
+header.compacto h1 {
+  font-size: 1.2rem;
+}
+
+header.compacto .subtitulo {
+  display: none;
+}
+
 main {
   max-width: 640px;
   margin: 0 auto;

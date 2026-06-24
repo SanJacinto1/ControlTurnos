@@ -145,6 +145,7 @@ function mostrarVista(idVista) {
   ['vistaSetup', 'vistaDashboard', 'vistaTurno'].forEach(id => {
     document.getElementById(id).classList.toggle('hidden', id !== idVista);
   });
+  document.querySelector('header').classList.toggle('compacto', idVista !== 'vistaDashboard');
 }
 
 function mostrarDashboard() {
