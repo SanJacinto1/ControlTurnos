@@ -580,14 +580,14 @@ function construirTicketHTML() {
       <style>
         @page { margin: 0; }
         html, body { margin: 0; padding: 0; }
-        body { padding: 2px 4px; font-family: 'Courier New', monospace; font-size: 19px; font-weight: bold; }
+        body { padding: 2px 4px; font-family: 'Courier New', monospace; font-size: 21px; font-weight: bold; }
         .ticket { width: 100%; }
-        h2 { text-align: center; margin: 0 0 4px; font-size: 23px; }
-        .centrado { text-align: center; margin: 0 0 10px; font-size: 16px; }
+        h2 { text-align: center; margin: 0 0 4px; font-size: 25px; }
+        .centrado { text-align: center; margin: 0 0 10px; font-size: 18px; }
         .linea { border-top: 1px dashed #000; margin: 8px 0; }
         .fila { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; }
-        .resultado { text-align: center; margin-top: 12px; font-size: 23px; font-weight: bold; }
-        .pie { text-align: center; margin-top: 14px; font-size: 14px; }
+        .resultado { text-align: center; margin-top: 12px; font-size: 25px; font-weight: bold; }
+        .pie { text-align: center; margin-top: 14px; font-size: 16px; }
       </style>
     </head>
     <body>
