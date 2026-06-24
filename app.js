@@ -619,7 +619,6 @@ function imprimirHTML(htmlCompleto) {
   areaImpresion.innerHTML = estilo + cuerpo;
   setTimeout(() => {
     window.print();
-    setTimeout(() => { areaImpresion.innerHTML = ''; }, 1000);
   }, 200);
 }
 

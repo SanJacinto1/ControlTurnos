@@ -335,9 +335,20 @@
   window.addEventListener('error', function (e) {
     alert('Error en la app: ' + e.message + '\n(línea ' + e.lineno + ' de ' + (e.filename || '').split('/').pop() + ')');
   });
-  // Service worker desactivado temporalmente para probar si interfiere con la impresión.
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+    navigator.serviceWorker.register('sw.js').then(registro => {
+      const haySWActivoPrevio = !!navigator.serviceWorker.controller;
+      registro.update();
+      registro.addEventListener('updatefound', () => {
+        const nuevo = registro.installing;
+        if (!nuevo) return;
+        nuevo.addEventListener('statechange', () => {
+          if (nuevo.state === 'activated' && haySWActivoPrevio) {
+            window.location.reload();
+          }
+        });
+      });
+    });
   }
 </script>
 </body>
