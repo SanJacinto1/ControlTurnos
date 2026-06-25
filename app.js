@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.5';
+const APP_VERSION = '3.6';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -442,7 +442,7 @@ function construirTicketValeHTML(datos) {
   const fechaHora = new Date().toLocaleString('es-EC');
 
   const filas = datos.items.map(item =>
-    `<div class="detalle-item"><span>${item.descripcion}</span><span>$${item.valor.toFixed(2)}</span></div>`
+    `<div class="fila"><div class="etiqueta">${item.descripcion}</div><div class="valor">$${item.valor.toFixed(2)}</div></div>`
   ).join('');
 
   return `
@@ -451,21 +451,25 @@ function construirTicketValeHTML(datos) {
       <meta charset="UTF-8">
       <title>Vale de caja</title>
       <style>
-        @page { size: A4; margin: 3mm; }
+        @page { size: 4in auto; margin: 4mm; }
         html, body { margin: 0; padding: 0; }
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
         .ticket { width: 100%; }
-        .encabezado { text-align: center; border-bottom: 3px dashed #000; margin-bottom: 12px; padding-bottom: 10px; }
-        .encabezado h2 { margin: 0 0 6px; font-size: 74px; font-weight: normal; }
-        .encabezado p { margin: 0; font-size: 40px; }
-        .datos { margin-bottom: 30px; font-size: 49px; }
-        .datos div { padding: 5px 0; }
-        .detalle-item { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-size: 49px; }
-        .total { border-top: 3px solid #000; padding-top: 10px; margin-top: 10px; margin-bottom: 30px; font-size: 60px; }
-        .firma { margin-top: 26px; border-top: 1px dashed #000; padding-top: 12px; font-size: 43px; }
-        .firma .linea-firma { margin-top: 90px; margin-bottom: 30px; }
-        .elaborado-por { font-size: 56px; margin-top: 30px; }
-        .impreso { text-align: center; margin-top: 14px; font-size: 38px; }
+        .encabezado { text-align: center; border-bottom: 3px dashed #000; margin-bottom: 16px; padding-bottom: 14px; }
+        .encabezado h2 { margin: 0 0 8px; font-size: 38px; font-weight: normal; }
+        .encabezado p { margin: 0; font-size: 22px; }
+        .datos { margin-bottom: 16px; }
+        .datos .fila { padding: 6px 0; }
+        .fila { padding: 10px 0; font-size: 30px; }
+        .fila .etiqueta { color: #333; }
+        .fila .valor { font-size: 36px; }
+        .total { border-top: 3px solid #000; padding-top: 12px; margin-top: 14px; }
+        .total .etiqueta { font-size: 30px; }
+        .total .valor { font-size: 40px; }
+        .firma { margin-top: 30px; border-top: 1px dashed #000; padding-top: 16px; font-size: 28px; }
+        .firma .linea-firma { margin-top: 70px; margin-bottom: 24px; font-size: 30px; }
+        .elaborado-por { font-size: 30px; margin-top: 20px; }
+        .impreso { text-align: center; margin-top: 18px; font-size: 22px; }
       </style>
     </head>
     <body>
@@ -475,12 +479,12 @@ function construirTicketValeHTML(datos) {
           <p>DEBO Y PAGARE EL VALOR EXPRESADO EN ESTE DOCUMENTO A FASTGAS S.A.S.</p>
         </div>
         <div class="datos">
-          <div>Recibo: ${datos.numeroRecibo}</div>
-          <div>Fecha: ${fecha}</div>
-          <div>Cliente: ${datos.cliente}</div>
+          <div class="fila"><div class="etiqueta">Recibo</div><div class="valor">${datos.numeroRecibo}</div></div>
+          <div class="fila"><div class="etiqueta">Fecha</div><div class="valor">${fecha}</div></div>
+          <div class="fila"><div class="etiqueta">Cliente</div><div class="valor">${datos.cliente}</div></div>
         </div>
-        <div class="detalle">${filas}</div>
-        <div class="detalle-item total"><span>TOTAL:</span><span>$${datos.total.toFixed(2)}</span></div>
+        ${filas}
+        <div class="fila total"><div class="etiqueta">TOTAL</div><div class="valor">$${datos.total.toFixed(2)}</div></div>
         <div class="firma">
           <div>Firma:</div>
           <div class="linea-firma">_________________________</div>
@@ -627,7 +631,7 @@ function construirTicketHTML() {
     ['Cheques', formatoMoneda(datos.cheques)],
     ['Total cobrado', formatoMoneda(totalCobrado)],
     ['Venta aceites', formatoMoneda(datos.ventaAceites)],
-  ].map(([etiqueta, valor]) => `<div class="fila"><span>${etiqueta}</span><span>${valor}</span></div>`).join('');
+  ].map(([etiqueta, valor]) => `<div class="fila"><div class="etiqueta">${etiqueta}</div><div class="valor">${valor}</div></div>`).join('');
 
   return `
     <html>
@@ -635,21 +639,23 @@ function construirTicketHTML() {
       <meta charset="UTF-8">
       <title>Ticket de turno</title>
       <style>
-        @page { size: A4; margin: 3mm; }
+        @page { size: 4in auto; margin: 4mm; }
         html, body { margin: 0; padding: 0; }
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
         .ticket { width: 100%; }
-        .linea { border-top: 3px dashed #000; margin: 14px 0; }
-        .fila { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; font-size: 49px; }
-        .resultado { text-align: center; margin-top: 20px; font-size: 60px; }
-        .pie { text-align: center; margin-top: 22px; font-size: 31px; }
+        .linea { border-top: 3px dashed #000; margin: 16px 0; }
+        .fila { padding: 10px 0; font-size: 30px; }
+        .fila .etiqueta { color: #333; }
+        .fila .valor { font-size: 36px; }
+        .resultado { text-align: center; margin-top: 22px; font-size: 40px; }
+        .pie { text-align: center; margin-top: 20px; font-size: 22px; }
       </style>
     </head>
     <body>
       <div class="ticket">
-        <div class="fila"><span>Fecha</span><span>${datos.fecha}</span></div>
-        <div class="fila"><span>Turno</span><span>${datos.turno}</span></div>
-        <div class="fila"><span>Despachador</span><span>${datos.nombre}</span></div>
+        <div class="fila"><div class="etiqueta">Fecha</div><div class="valor">${datos.fecha}</div></div>
+        <div class="fila"><div class="etiqueta">Turno</div><div class="valor">${datos.turno}</div></div>
+        <div class="fila"><div class="etiqueta">Despachador</div><div class="valor">${datos.nombre}</div></div>
         <div class="linea"></div>
         ${filas}
         <div class="linea"></div>
