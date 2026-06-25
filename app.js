@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.11';
+const APP_VERSION = '3.12';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -662,17 +662,28 @@ function construirTicketHTML() {
 }
 
 function imprimirHTML(htmlCompleto) {
-  const areaImpresion = document.getElementById('areaImpresion');
-  const estiloMatch = htmlCompleto.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
-  const cuerpoMatch = htmlCompleto.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-  const estilo = estiloMatch ? `<style>${estiloMatch[1]}</style>` : '';
-  let cuerpo = cuerpoMatch ? cuerpoMatch[1] : htmlCompleto;
-  cuerpo = cuerpo.replace(/<script[\s\S]*?<\/script>/gi, '');
+  const iframe = document.createElement('iframe');
+  iframe.title = 'Impresion';
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '1px';
+  iframe.style.height = '1px';
+  iframe.style.border = '0';
+  iframe.style.opacity = '0';
 
-  areaImpresion.innerHTML = estilo + cuerpo;
+  document.body.appendChild(iframe);
+
+  const documento = iframe.contentWindow.document;
+  documento.open();
+  documento.write(htmlCompleto.replace(/<script[\s\S]*?<\/script>/gi, ''));
+  documento.close();
+
   setTimeout(() => {
-    window.print();
-  }, 200);
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    setTimeout(() => iframe.remove(), 1000);
+  }, 300);
 }
 
 function imprimirTurno() {
