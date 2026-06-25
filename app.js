@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.12';
+const APP_VERSION = '3.13';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -662,28 +662,37 @@ function construirTicketHTML() {
 }
 
 function imprimirHTML(htmlCompleto) {
-  const iframe = document.createElement('iframe');
-  iframe.title = 'Impresion';
-  iframe.style.position = 'fixed';
-  iframe.style.right = '0';
-  iframe.style.bottom = '0';
-  iframe.style.width = '1px';
-  iframe.style.height = '1px';
-  iframe.style.border = '0';
-  iframe.style.opacity = '0';
+  const estiloMatch = htmlCompleto.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+  const cuerpoMatch = htmlCompleto.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+  const estiloTicket = estiloMatch ? estiloMatch[1] : '';
+  const cuerpoTicket = (cuerpoMatch ? cuerpoMatch[1] : htmlCompleto).replace(/<script[\s\S]*?<\/script>/gi, '');
+  const contenidoOriginal = document.body.innerHTML;
+  const claseOriginal = document.body.className;
 
-  document.body.appendChild(iframe);
+  document.body.className = 'modo-impresion-ticket';
+  document.body.innerHTML = `
+    <style>
+      @page { size: 80mm auto; margin: 0; }
+      html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+      body { width: 80mm; }
+      ${estiloTicket}
+      .ticket { margin: 0 !important; padding: 0 !important; }
+    </style>
+    ${cuerpoTicket}
+  `;
 
-  const documento = iframe.contentWindow.document;
-  documento.open();
-  documento.write(htmlCompleto.replace(/<script[\s\S]*?<\/script>/gi, ''));
-  documento.close();
+  let appRestaurada = false;
+  const restaurarApp = () => {
+    if (appRestaurada) return;
+    appRestaurada = true;
+    document.body.className = claseOriginal;
+    document.body.innerHTML = contenidoOriginal;
+    window.location.reload();
+  };
 
-  setTimeout(() => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-    setTimeout(() => iframe.remove(), 1000);
-  }, 300);
+  window.addEventListener('afterprint', restaurarApp, { once: true });
+  setTimeout(() => window.print(), 150);
+  setTimeout(restaurarApp, 60000);
 }
 
 function imprimirTurno() {
