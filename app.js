@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.8';
+const APP_VERSION = '3.9';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -451,20 +451,20 @@ function construirTicketValeHTML(datos) {
       <meta charset="UTF-8">
       <title>Vale de caja</title>
       <style>
-        @page { margin: 3mm; }
+        @page { margin: 8mm; }
         html, body { margin: 0; padding: 0; }
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
-        .ticket { width: 100%; }
+        .ticket { width: 100%; padding-top: 10px; }
         .encabezado { text-align: center; border-bottom: 3px dashed #000; margin-bottom: 12px; padding-bottom: 10px; }
-        .encabezado h2 { margin: 0 0 6px; font-size: 74px; font-weight: normal; }
+        .encabezado h2 { margin: 0 0 89px; font-size: 74px; font-weight: normal; }
         .encabezado p { margin: 0; font-size: 40px; }
-        .datos { margin-bottom: 30px; font-size: 49px; }
+        .datos { margin-bottom: 59px; font-size: 49px; }
         .datos div { padding: 5px 0; }
         .detalle-item { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-size: 49px; }
-        .total { border-top: 3px solid #000; padding-top: 10px; margin-top: 10px; margin-bottom: 30px; font-size: 60px; }
+        .total { border-top: 3px solid #000; padding-top: 10px; margin-top: 10px; margin-bottom: 144px; font-size: 60px; }
         .firma { margin-top: 26px; border-top: 1px dashed #000; padding-top: 12px; font-size: 43px; }
         .firma .linea-firma { margin-top: 90px; margin-bottom: 30px; }
-        .elaborado-por { font-size: 56px; margin-top: 30px; }
+        .elaborado-por { font-size: 56px; margin-top: 30px; margin-bottom: 67px; }
         .impreso { text-align: center; margin-top: 14px; font-size: 38px; }
       </style>
     </head>
