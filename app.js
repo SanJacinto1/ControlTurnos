@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.14';
+const APP_VERSION = '3.15';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -664,37 +664,35 @@ function construirTicketHTML() {
 }
 
 function imprimirHTML(htmlCompleto) {
+  const areaImpresion = document.getElementById('areaImpresion');
   const estiloMatch = htmlCompleto.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
   const cuerpoMatch = htmlCompleto.match(/<body[^>]*>([\s\S]*)<\/body>/i);
   const estiloTicket = estiloMatch ? estiloMatch[1] : '';
   const cuerpoTicket = (cuerpoMatch ? cuerpoMatch[1] : htmlCompleto).replace(/<script[\s\S]*?<\/script>/gi, '');
-  const contenidoOriginal = document.body.innerHTML;
-  const claseOriginal = document.body.className;
 
-  document.body.className = 'modo-impresion-ticket';
-  document.body.innerHTML = `
+  areaImpresion.innerHTML = `
     <style>
-      @page { size: 80mm auto; margin: 0; }
-      html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
-      body { width: 80mm; }
       ${estiloTicket}
-      .ticket { margin: 0 !important; padding: 0 !important; }
+      @page { size: 80mm; margin: 0; }
+      html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+      #areaImpresion { width: 80mm !important; margin: 0 !important; padding: 0 !important; }
+      #areaImpresion .ticket { width: 80mm !important; margin: 0 !important; padding: 0 !important; }
     </style>
     ${cuerpoTicket}
   `;
 
-  let appRestaurada = false;
-  const restaurarApp = () => {
-    if (appRestaurada) return;
-    appRestaurada = true;
-    document.body.className = claseOriginal;
-    document.body.innerHTML = contenidoOriginal;
-    window.location.reload();
+  let areaLimpiada = false;
+  const limpiarArea = () => {
+    if (areaLimpiada) return;
+    areaLimpiada = true;
+    areaImpresion.innerHTML = '';
   };
 
-  window.addEventListener('afterprint', restaurarApp, { once: true });
-  setTimeout(() => window.print(), 150);
-  setTimeout(restaurarApp, 60000);
+  window.addEventListener('afterprint', limpiarArea, { once: true });
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => window.print());
+  });
+  setTimeout(limpiarArea, 60000);
 }
 
 function imprimirTurno() {

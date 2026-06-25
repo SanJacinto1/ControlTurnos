@@ -18,8 +18,20 @@
 #areaImpresion { display: none; }
 
 @media print {
+  @page { size: 80mm; margin: 0; }
+  html, body {
+    width: 80mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
   body > *:not(#areaImpresion) { display: none !important; }
-  #areaImpresion { display: block !important; }
+  #areaImpresion {
+    display: block !important;
+    width: 80mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 }
 
 body {
