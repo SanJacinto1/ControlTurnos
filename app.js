@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.9';
+const APP_VERSION = '3.10';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -451,21 +451,21 @@ function construirTicketValeHTML(datos) {
       <meta charset="UTF-8">
       <title>Vale de caja</title>
       <style>
-        @page { margin: 8mm; }
+        @page { size: letter; margin: 10mm; }
         html, body { margin: 0; padding: 0; }
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
-        .ticket { width: 100%; padding-top: 10px; }
-        .encabezado { text-align: center; border-bottom: 3px dashed #000; margin-bottom: 12px; padding-bottom: 10px; }
-        .encabezado h2 { margin: 0 0 89px; font-size: 74px; font-weight: normal; }
-        .encabezado p { margin: 0; font-size: 40px; }
-        .datos { margin-bottom: 59px; font-size: 49px; }
-        .datos div { padding: 5px 0; }
-        .detalle-item { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-size: 49px; }
-        .total { border-top: 3px solid #000; padding-top: 10px; margin-top: 10px; margin-bottom: 144px; font-size: 60px; }
-        .firma { margin-top: 26px; border-top: 1px dashed #000; padding-top: 12px; font-size: 43px; }
-        .firma .linea-firma { margin-top: 90px; margin-bottom: 30px; }
-        .elaborado-por { font-size: 56px; margin-top: 30px; margin-bottom: 67px; }
-        .impreso { text-align: center; margin-top: 14px; font-size: 38px; }
+        .ticket { width: 100%; padding-top: 6px; }
+        .encabezado { text-align: center; border-bottom: 3px dashed #000; margin-bottom: 10px; padding-bottom: 8px; }
+        .encabezado h2 { margin: 0 0 40px; font-size: 56px; font-weight: normal; }
+        .encabezado p { margin: 0; font-size: 30px; }
+        .datos { margin-bottom: 30px; font-size: 38px; }
+        .datos div { padding: 4px 0; }
+        .detalle-item { display: flex; justify-content: space-between; gap: 16px; padding: 5px 0; font-size: 38px; }
+        .total { border-top: 3px solid #000; padding-top: 8px; margin-top: 8px; margin-bottom: 70px; font-size: 46px; }
+        .firma { margin-top: 20px; border-top: 1px dashed #000; padding-top: 10px; font-size: 33px; }
+        .firma .linea-firma { margin-top: 60px; margin-bottom: 20px; }
+        .elaborado-por { font-size: 43px; margin-top: 20px; margin-bottom: 36px; }
+        .impreso { text-align: center; margin-top: 10px; font-size: 29px; }
       </style>
     </head>
     <body>
@@ -635,14 +635,14 @@ function construirTicketHTML() {
       <meta charset="UTF-8">
       <title>Ticket de turno</title>
       <style>
-        @page { margin: 3mm; }
+        @page { size: letter; margin: 10mm; }
         html, body { margin: 0; padding: 0; }
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
         .ticket { width: 100%; }
-        .linea { border-top: 3px dashed #000; margin: 14px 0; }
-        .fila { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; font-size: 49px; }
-        .resultado { text-align: center; margin-top: 20px; font-size: 60px; }
-        .pie { text-align: center; margin-top: 22px; font-size: 31px; }
+        .linea { border-top: 3px dashed #000; margin: 12px 0; }
+        .fila { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-size: 38px; }
+        .resultado { text-align: center; margin-top: 16px; font-size: 46px; }
+        .pie { text-align: center; margin-top: 18px; font-size: 24px; }
       </style>
     </head>
     <body>
