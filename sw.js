@@ -1,4 +1,4 @@
-const CACHE = 'control-turno-v25';
+const CACHE = 'control-turno-v26';
 const ARCHIVOS = ['./', 'index.html', 'style.css', 'logic.js', 'app.js', 'logo.svg', 'icon.svg', 'manifest.json'];
 
 self.addEventListener('install', event => {

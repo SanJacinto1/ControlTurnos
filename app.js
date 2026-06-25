@@ -7,6 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
+const APP_VERSION = '26';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -580,21 +581,16 @@ function construirTicketHTML() {
       <style>
         @page { size: A4; margin: 8mm; }
         html, body { margin: 0; padding: 0; }
-        body { font-family: 'Courier New', monospace; font-weight: bold; color: #000; }
+        body { font-family: 'Courier New', monospace; font-weight: normal; color: #000; }
         .ticket { width: 100%; }
-        h2 { text-align: center; margin: 0 0 6px; font-size: 48px; }
-        .centrado { text-align: center; margin: 0 0 22px; font-size: 31px; }
-        .linea { border-top: 3px dashed #000; margin: 20px 0; }
-        .fila { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; font-size: 37px; }
-        .resultado { text-align: center; margin-top: 26px; font-size: 48px; font-weight: bold; }
-        .pie { text-align: center; margin-top: 30px; font-size: 25px; }
+        .linea { border-top: 3px dashed #000; margin: 22px 0; }
+        .fila { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; font-size: 43px; }
+        .resultado { text-align: center; margin-top: 30px; font-size: 54px; }
+        .pie { text-align: center; margin-top: 34px; font-size: 29px; }
       </style>
     </head>
     <body>
       <div class="ticket">
-        <h2>E/S SAN JACINTO</h2>
-        <p class="centrado">Control de Turno</p>
-        <div class="linea"></div>
         <div class="fila"><span>Fecha</span><span>${datos.fecha}</span></div>
         <div class="fila"><span>Turno</span><span>${datos.turno}</span></div>
         <div class="fila"><span>Despachador</span><span>${datos.nombre}</span></div>
@@ -752,6 +748,8 @@ function usarDetalleEfectivo() {
 
 document.addEventListener('DOMContentLoaded', () => {
   cargarBorrador();
+
+  document.getElementById('versionApp').textContent = 'Versión ' + APP_VERSION;
 
   campos.forEach(id => {
     document.getElementById(id).addEventListener('input', recalcular);

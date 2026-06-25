@@ -298,6 +298,13 @@ input[readonly] {
   font-size: 1.6rem;
 }
 
+.version-app {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-neutro);
+  margin: 4px 0 0;
+}
+
 .dashboard-tarjeta strong {
   font-size: 1.3rem;
 }
