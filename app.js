@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '26';
+const APP_VERSION = '27';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -437,6 +437,60 @@ function cerrarModalVale() {
   cerrarEstadoActual();
 }
 
+function construirTicketValeHTML(datos) {
+  const fecha = new Date().toLocaleDateString('es-EC');
+  const fechaHora = new Date().toLocaleString('es-EC');
+
+  const filas = datos.items.map(item =>
+    `<div class="detalle-item"><span>${item.descripcion}</span><span>$${item.valor.toFixed(2)}</span></div>`
+  ).join('');
+
+  return `
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Vale de caja</title>
+      <style>
+        @page { size: A4; margin: 8mm; }
+        html, body { margin: 0; padding: 0; }
+        body { font-family: 'Courier New', monospace; font-weight: normal; color: #000; }
+        .ticket { width: 100%; }
+        .encabezado { text-align: center; border-bottom: 3px dashed #000; margin-bottom: 24px; padding-bottom: 20px; }
+        .encabezado h2 { margin: 0 0 12px; font-size: 46px; font-weight: normal; }
+        .encabezado p { margin: 0; font-size: 25px; }
+        .datos { margin-bottom: 24px; font-size: 35px; }
+        .datos div { padding: 7px 0; }
+        .detalle-item { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; font-size: 37px; }
+        .total { border-top: 3px solid #000; padding-top: 18px; margin-top: 20px; font-size: 46px; }
+        .firma { margin-top: 60px; border-top: 1px dashed #000; padding-top: 24px; font-size: 33px; }
+        .firma .linea-firma { margin-bottom: 60px; }
+        .impreso { text-align: center; margin-top: 28px; font-size: 23px; }
+      </style>
+    </head>
+    <body>
+      <div class="ticket">
+        <div class="encabezado">
+          <h2>FASTGAS S.A.S.</h2>
+          <p>DEBO Y PAGARE EL VALOR EXPRESADO EN ESTE DOCUMENTO A FASTGAS S.A.S.</p>
+        </div>
+        <div class="datos">
+          <div>Recibo: ${datos.numeroRecibo}</div>
+          <div>Fecha: ${fecha}</div>
+          <div>Cliente: ${datos.cliente}</div>
+        </div>
+        <div class="detalle">${filas}</div>
+        <div class="detalle-item total"><span>TOTAL:</span><span>$${datos.total.toFixed(2)}</span></div>
+        <div class="firma">
+          <div class="linea-firma">Firma: _________________________</div>
+          <div>Elaborado por: ${datos.elaborado}</div>
+        </div>
+        <div class="impreso">Impreso el: ${fechaHora}</div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
 async function generarVale() {
   const cliente = document.getElementById('valeCliente').value.trim();
   const elaborado = document.getElementById('valeElaborado').value.trim();
@@ -473,7 +527,7 @@ async function generarVale() {
 
     if (!resultado.ok) throw new Error(resultado.error || 'Error desconocido');
 
-    imprimirHTML(resultado.ticketHTML);
+    imprimirHTML(construirTicketValeHTML({ numeroRecibo: resultado.numeroRecibo, cliente, elaborado, total, items }));
 
     estadoEl.textContent = `Recibo #${resultado.numeroRecibo} generado correctamente.`;
     document.getElementById('valeCliente').value = '';
