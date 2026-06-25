@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '29';
+const APP_VERSION = '31';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -455,16 +455,17 @@ function construirTicketValeHTML(datos) {
         html, body { margin: 0; padding: 0; }
         body { font-family: 'Courier New', monospace; font-weight: normal; color: #000; }
         .ticket { width: 100%; }
-        .encabezado { text-align: center; border-bottom: 3px dashed #000; margin-bottom: 18px; padding-bottom: 16px; }
-        .encabezado h2 { margin: 0 0 10px; font-size: 56px; font-weight: normal; }
-        .encabezado p { margin: 0; font-size: 29px; }
-        .datos { margin-bottom: 18px; font-size: 49px; }
-        .datos div { padding: 6px 0; }
-        .detalle-item { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; font-size: 49px; }
-        .total { border-top: 3px solid #000; padding-top: 14px; margin-top: 16px; font-size: 60px; }
-        .firma { margin-top: 44px; border-top: 1px dashed #000; padding-top: 20px; font-size: 43px; }
-        .firma .linea-firma { margin-bottom: 50px; }
-        .impreso { text-align: center; margin-top: 22px; font-size: 31px; }
+        .encabezado { text-align: center; border-bottom: 3px dashed #000; margin-bottom: 12px; padding-bottom: 10px; }
+        .encabezado h2 { margin: 0 0 6px; font-size: 50px; font-weight: normal; }
+        .encabezado p { margin: 0; font-size: 26px; }
+        .datos { margin-bottom: 14px; font-size: 49px; }
+        .datos div { padding: 5px 0; }
+        .detalle-item { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-size: 49px; }
+        .total { border-top: 3px solid #000; padding-top: 10px; margin-top: 10px; font-size: 60px; }
+        .firma { margin-top: 26px; border-top: 1px dashed #000; padding-top: 12px; font-size: 43px; }
+        .firma .linea-firma { margin-top: 110px; margin-bottom: 30px; }
+        .elaborado-por { font-size: 56px; margin-top: 6px; }
+        .impreso { text-align: center; margin-top: 14px; font-size: 38px; }
       </style>
     </head>
     <body>
@@ -481,8 +482,9 @@ function construirTicketValeHTML(datos) {
         <div class="detalle">${filas}</div>
         <div class="detalle-item total"><span>TOTAL:</span><span>$${datos.total.toFixed(2)}</span></div>
         <div class="firma">
-          <div class="linea-firma">Firma: _________________________</div>
-          <div>Elaborado por: ${datos.elaborado}</div>
+          <div>Firma:</div>
+          <div class="linea-firma">_________________________</div>
+          <div class="elaborado-por">Elaborado por: ${datos.elaborado}</div>
         </div>
         <div class="impreso">Impreso el: ${fechaHora}</div>
       </div>
