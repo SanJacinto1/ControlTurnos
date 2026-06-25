@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.15';
+const APP_VERSION = '3.16';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -664,35 +664,61 @@ function construirTicketHTML() {
 }
 
 function imprimirHTML(htmlCompleto) {
-  const areaImpresion = document.getElementById('areaImpresion');
   const estiloMatch = htmlCompleto.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
   const cuerpoMatch = htmlCompleto.match(/<body[^>]*>([\s\S]*)<\/body>/i);
   const estiloTicket = estiloMatch ? estiloMatch[1] : '';
   const cuerpoTicket = (cuerpoMatch ? cuerpoMatch[1] : htmlCompleto).replace(/<script[\s\S]*?<\/script>/gi, '');
+  const urlApp = window.location.href.split('#')[0];
 
-  areaImpresion.innerHTML = `
-    <style>
-      ${estiloTicket}
-      @page { size: 80mm; margin: 0; }
-      html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
-      #areaImpresion { width: 80mm !important; margin: 0 !important; padding: 0 !important; }
-      #areaImpresion .ticket { width: 80mm !important; margin: 0 !important; padding: 0 !important; }
-    </style>
-    ${cuerpoTicket}
-  `;
-
-  let areaLimpiada = false;
-  const limpiarArea = () => {
-    if (areaLimpiada) return;
-    areaLimpiada = true;
-    areaImpresion.innerHTML = '';
-  };
-
-  window.addEventListener('afterprint', limpiarArea, { once: true });
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => window.print());
-  });
-  setTimeout(limpiarArea, 60000);
+  document.open();
+  document.write(`
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Imprimir recibo</title>
+      <style>
+        ${estiloTicket}
+        @page { size: 80mm; margin: 0; }
+        html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+        body { width: 80mm !important; min-height: 0 !important; }
+        .ticket { width: 80mm !important; margin: 0 !important; padding: 0 !important; }
+        .acciones-impresion { display: none; }
+        @media screen {
+          .acciones-impresion {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+          }
+          .acciones-impresion button {
+            font: 16px Arial, sans-serif;
+            padding: 8px 10px;
+          }
+        }
+        @media print { .acciones-impresion { display: none !important; } }
+      </style>
+    </head>
+    <body>
+      <div class="acciones-impresion">
+        <button type="button" onclick="window.print()">Imprimir</button>
+        <button type="button" onclick="location.href='${urlApp}'">Volver</button>
+      </div>
+      ${cuerpoTicket}
+      <script>
+        window.addEventListener('afterprint', function () {
+          setTimeout(function () { location.href = '${urlApp}'; }, 500);
+        });
+        setTimeout(function () { window.print(); }, 500);
+      <\/script>
+    </body>
+    </html>
+  `);
+  document.close();
 }
 
 function imprimirTurno() {
