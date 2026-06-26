@@ -31,8 +31,11 @@
         <label>PIN (4 dígitos)
           <input type="password" inputmode="numeric" maxlength="4" id="setupPin" placeholder="••••">
         </label>
+        <label>N° de identificación
+          <input type="text" inputmode="numeric" id="setupId" placeholder="Solo la primera vez">
+        </label>
       </div>
-      <p class="hint">Si es tu primera vez, ese PIN queda registrado a tu nombre. Si ya tenías cuenta, usa el mismo PIN de antes.</p>
+      <p class="hint">Si es tu primera vez, necesitas tu número de identificación autorizado por el administrador, y eliges el PIN que vas a usar de ahora en adelante. Si ya tenías cuenta, solo pon tu nombre y PIN (el ID no es necesario otra vez).</p>
       <button type="button" id="btnGuardarPerfil">Continuar</button>
       <p id="setupEstado" class="hint"></p>
     </section>

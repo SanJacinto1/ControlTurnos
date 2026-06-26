@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.26';
+const APP_VERSION = '3.27';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -127,6 +127,7 @@ function leerPerfil() {
 async function guardarPerfil() {
   const nombre = document.getElementById('setupNombre').value.trim();
   const pin = document.getElementById('setupPin').value.trim();
+  const id = document.getElementById('setupId').value.trim();
   const estadoEl = document.getElementById('setupEstado');
 
   if (!nombre || !/^\d{4}$/.test(pin)) {
@@ -142,7 +143,7 @@ async function guardarPerfil() {
     const respuesta = await fetch(VALE_APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ accion: 'registrarDespachador', datos: { nombre, pin } }),
+      body: JSON.stringify({ accion: 'registrarDespachador', datos: { nombre, pin, id } }),
     });
     const resultado = await respuesta.json();
 
