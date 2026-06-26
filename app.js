@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.31';
+const APP_VERSION = '3.32';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -555,16 +555,16 @@ function construirTicketValeHTML(datos) {
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
         .ticket { width: 100%; }
         .encabezado { text-align: center; border-bottom: 2px dashed #000; margin-bottom: 8px; padding-bottom: 6px; }
-        .encabezado h2 { margin: 0 0 3px; font-size: 26px; font-weight: bold; }
-        .encabezado p { margin: 0; font-size: 13px; }
+        .encabezado h2 { margin: 0 0 3px; font-size: 28px; font-weight: normal; }
+        .encabezado p { margin: 0; font-size: 15px; }
         .datos { margin-bottom: 10px; }
-        .dato-linea { padding: 4px 0; font-size: 16px; }
-        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 17px; }
-        .total { display: flex; justify-content: space-between; gap: 8px; border-top: 2px solid #000; padding: 8px 0 0; margin-top: 6px; font-size: 20px; font-weight: bold; }
-        .firma { margin-top: 18px; border-top: 1px dashed #000; padding-top: 8px; font-size: 13px; }
-        .firma .linea-firma { margin-top: 36px; margin-bottom: 10px; font-size: 13px; }
-        .elaborado-por { font-size: 16px; margin-top: 8px; }
-        .impreso { text-align: center; margin-top: 10px; font-size: 11px; }
+        .dato-linea { padding: 4px 0; font-size: 18px; }
+        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 19px; }
+        .total { display: flex; justify-content: space-between; gap: 8px; border-top: 2px solid #000; padding: 8px 0 0; margin-top: 6px; font-size: 22px; font-weight: normal; }
+        .firma { margin-top: 18px; border-top: 1px dashed #000; padding-top: 8px; font-size: 15px; }
+        .firma .linea-firma { margin-top: 36px; margin-bottom: 10px; font-size: 15px; }
+        .elaborado-por { font-size: 18px; margin-top: 8px; }
+        .impreso { text-align: center; margin-top: 10px; font-size: 13px; }
       </style>
     </head>
     <body>
@@ -741,9 +741,9 @@ function construirTicketHTML() {
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
         .ticket { width: 100%; }
         .linea { border-top: 2px dashed #000; margin: 8px 0; }
-        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 17px; }
-        .resultado { text-align: center; margin-top: 12px; font-size: 26px; font-weight: bold; }
-        .pie { text-align: center; margin-top: 12px; font-size: 11px; }
+        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 19px; }
+        .resultado { text-align: center; margin-top: 12px; font-size: 28px; font-weight: normal; }
+        .pie { text-align: center; margin-top: 12px; font-size: 13px; }
       </style>
     </head>
     <body>
@@ -799,10 +799,10 @@ function construirTicketDetalleHTML(titulo, entradas, total) {
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
         .ticket { width: 100%; }
         .linea { border-top: 2px dashed #000; margin: 8px 0; }
-        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 17px; }
-        .resultado { text-align: center; margin-top: 12px; font-size: 26px; font-weight: bold; }
-        .pie { text-align: center; margin-top: 12px; font-size: 11px; }
-        h2 { text-align: center; margin: 0 0 8px; font-size: 22px; font-weight: bold; }
+        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 19px; }
+        .resultado { text-align: center; margin-top: 12px; font-size: 28px; font-weight: normal; }
+        .pie { text-align: center; margin-top: 12px; font-size: 13px; }
+        h2 { text-align: center; margin: 0 0 8px; font-size: 24px; font-weight: normal; }
       </style>
     </head>
     <body>
