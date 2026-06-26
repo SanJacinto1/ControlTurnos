@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.16';
+const APP_VERSION = '3.18';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -680,7 +680,7 @@ function imprimirHTML(htmlCompleto) {
       <title>Imprimir recibo</title>
       <style>
         ${estiloTicket}
-        @page { size: 80mm; margin: 0; }
+        @page { size: 80mm auto; margin: 0; }
         html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
         body { width: 80mm !important; min-height: 0 !important; }
         .ticket { width: 80mm !important; margin: 0 !important; padding: 0 !important; }
@@ -710,10 +710,7 @@ function imprimirHTML(htmlCompleto) {
       </div>
       ${cuerpoTicket}
       <script>
-        window.addEventListener('afterprint', function () {
-          setTimeout(function () { location.href = '${urlApp}'; }, 500);
-        });
-        setTimeout(function () { window.print(); }, 500);
+        // El usuario imprime manualmente despues de confirmar que el recibo se ve bien.
       <\/script>
     </body>
     </html>
