@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.27';
+const APP_VERSION = '3.28';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -780,11 +780,62 @@ function imprimirTurno() {
   imprimirHTML(construirTicketHTML());
 }
 
+function construirTicketDetalleHTML(titulo, entradas, total) {
+  const perfil = leerPerfil();
+  const fecha = new Date().toLocaleDateString('es-EC');
+  const horaImpresion = new Date().toLocaleString('es-EC');
+  const filas = entradas.map(entrada =>
+    `<div class="fila"><span>${entrada.referencia || '(sin referencia)'}</span><span>${formatoMoneda(entrada.valor)}</span></div>`
+  ).join('');
+
+  return `
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>${titulo}</title>
+      <style>
+        @page { margin: 3mm; }
+        html, body { margin: 0; padding: 0; }
+        body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
+        .ticket { width: 100%; }
+        .linea { border-top: 3px dashed #000; margin: 14px 0; }
+        .fila { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; font-size: 49px; }
+        .resultado { text-align: center; margin-top: 20px; font-size: 60px; }
+        .pie { text-align: center; margin-top: 22px; font-size: 31px; }
+        h2 { text-align: center; margin: 0 0 12px; font-size: 49px; font-weight: normal; }
+      </style>
+    </head>
+    <body>
+      <div class="ticket">
+        <h2>${titulo}</h2>
+        <div class="fila"><span>Fecha</span><span>${fecha}</span></div>
+        <div class="fila"><span>Despachador</span><span>${perfil ? perfil.nombre : ''}</span></div>
+        <div class="linea"></div>
+        ${filas}
+        <div class="linea"></div>
+        <div class="resultado">Total: ${formatoMoneda(total)}</div>
+        <div class="pie">Impreso: ${horaImpresion}</div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function imprimirDetalle(tipo) {
+  const entradas = leerEntradasDetalle(tipo);
+  if (entradas.length === 0) {
+    alert('Todavía no hay nada registrado para imprimir.');
+    return;
+  }
+  const total = sumarEntradas(entradas);
+  imprimirHTML(construirTicketDetalleHTML(CONFIG_DETALLE[tipo].titulo, entradas, total));
+}
+
 // --- Detalle de tarjetas y transferencias (registro uno por uno) ---
 
 const CONFIG_DETALLE = {
-  tarjetas: { storageKey: DETALLE_TARJETAS_KEY, campoId: 'tarjetas', refId: 'tarjetaReferencia', valorId: 'tarjetaValor', listaId: 'listaTarjetas', totalId: 'totalTarjetas', modalId: 'modalTarjetas', vacio: 'Todavía no hay tarjetas registradas en este turno.' },
-  transferencias: { storageKey: DETALLE_TRANSFERENCIAS_KEY, campoId: 'transferencias', refId: 'transferenciaReferencia', valorId: 'transferenciaValor', listaId: 'listaTransferencias', totalId: 'totalTransferencias', modalId: 'modalTransferencias', vacio: 'Todavía no hay transferencias registradas en este turno.' },
+  tarjetas: { storageKey: DETALLE_TARJETAS_KEY, campoId: 'tarjetas', refId: 'tarjetaReferencia', valorId: 'tarjetaValor', listaId: 'listaTarjetas', totalId: 'totalTarjetas', modalId: 'modalTarjetas', vacio: 'Todavía no hay tarjetas registradas en este turno.', titulo: 'Detalle de Tarjetas' },
+  transferencias: { storageKey: DETALLE_TRANSFERENCIAS_KEY, campoId: 'transferencias', refId: 'transferenciaReferencia', valorId: 'transferenciaValor', listaId: 'listaTransferencias', totalId: 'totalTransferencias', modalId: 'modalTransferencias', vacio: 'Todavía no hay transferencias registradas en este turno.', titulo: 'Detalle de Transferencias' },
 };
 
 function leerEntradasDetalle(tipo) {
@@ -942,11 +993,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnCerrarTarjetas').addEventListener('click', () => cerrarModalDetalle('tarjetas'));
   document.getElementById('btnUsarTarjetas').addEventListener('click', () => usarTotalDetalle('tarjetas'));
   document.getElementById('btnAgregarTarjeta').addEventListener('click', () => agregarEntradaDetalle('tarjetas'));
+  document.getElementById('btnImprimirTarjetas').addEventListener('click', () => imprimirDetalle('tarjetas'));
 
   document.getElementById('btnDetalleTransferencias').addEventListener('click', () => abrirModalDetalle('transferencias'));
   document.getElementById('btnCerrarTransferencias').addEventListener('click', () => cerrarModalDetalle('transferencias'));
   document.getElementById('btnUsarTransferencias').addEventListener('click', () => usarTotalDetalle('transferencias'));
   document.getElementById('btnAgregarTransferencia').addEventListener('click', () => agregarEntradaDetalle('transferencias'));
+  document.getElementById('btnImprimirTransferencias').addEventListener('click', () => imprimirDetalle('transferencias'));
 
   document.querySelectorAll('#modalEfectivo .detalle-fila input').forEach(input => {
     input.addEventListener('input', recalcularDetalleEfectivo);
