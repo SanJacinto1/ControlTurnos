@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.24';
+const APP_VERSION = '3.25';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -124,20 +124,89 @@ function leerPerfil() {
   return guardado ? JSON.parse(guardado) : null;
 }
 
-function guardarPerfil() {
+async function guardarPerfil() {
   const nombre = document.getElementById('setupNombre').value.trim();
-  if (!nombre) {
-    alert('Escribe tu nombre para continuar.');
+  const pin = document.getElementById('setupPin').value.trim();
+  const estadoEl = document.getElementById('setupEstado');
+
+  if (!nombre || !/^\d{4}$/.test(pin)) {
+    alert('Escribe tu nombre y un PIN de 4 dígitos.');
     return;
   }
-  localStorage.setItem(PERFIL_KEY, JSON.stringify({ nombre }));
-  mostrarDashboard();
+
+  const boton = document.getElementById('btnGuardarPerfil');
+  boton.disabled = true;
+  estadoEl.textContent = 'Verificando...';
+
+  try {
+    const respuesta = await fetch(VALE_APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'registrarDespachador', datos: { nombre, pin } }),
+    });
+    const resultado = await respuesta.json();
+
+    if (!resultado.ok) {
+      estadoEl.textContent = '';
+      alert(resultado.error || 'No se pudo verificar el PIN.');
+      return;
+    }
+
+    localStorage.setItem(PERFIL_KEY, JSON.stringify({ nombre, pin }));
+    estadoEl.textContent = 'Recuperando tu historial...';
+    await sincronizarHistorialDesdeNube(nombre, pin);
+    estadoEl.textContent = '';
+    mostrarDashboard();
+  } catch (err) {
+    estadoEl.textContent = '';
+    alert('No se pudo conectar para verificar tu PIN. Revisa tu internet e intenta de nuevo.');
+  } finally {
+    boton.disabled = false;
+  }
+}
+
+async function sincronizarHistorialDesdeNube(nombre, pin) {
+  try {
+    const respuesta = await fetch(VALE_APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'obtenerHistorial', datos: { nombre, pin } }),
+    });
+    const resultado = await respuesta.json();
+    if (!resultado.ok) return;
+
+    const historialLocal = leerHistorial();
+    const turnosNube = (resultado.turnos || []).map(t => ({
+      fecha: t.fecha, turno: t.turno, nombre: t.nombre,
+      totalVentas: Number(t.totalVentas) || 0, efectivo: Number(t.efectivo) || 0,
+      creditos: Number(t.creditos) || 0, tarjetas: Number(t.tarjetas) || 0,
+      transferencias: Number(t.transferencias) || 0, cheques: Number(t.cheques) || 0,
+      ventaAceites: Number(t.ventaAceites) || 0, resultadoFinal: Number(t.resultadoFinal) || 0,
+      guardadoEn: t.guardadoEn,
+    }));
+    const yaExiste = registro => historialLocal.some(h => h.fecha === registro.fecha && h.turno === registro.turno && h.nombre === registro.nombre);
+    const combinadoHistorial = [...historialLocal, ...turnosNube.filter(r => !yaExiste(r))];
+    localStorage.setItem(HISTORIAL_KEY, JSON.stringify(combinadoHistorial));
+
+    const anticiposLocal = leerAnticipos();
+    const anticiposNube = (resultado.anticipos || []).map(a => ({
+      fecha: a.fecha, nombre: a.nombre, monto: Number(a.monto) || 0, concepto: a.concepto || '', guardadoEn: a.guardadoEn,
+    }));
+    const yaExisteAnticipo = registro => anticiposLocal.some(a => a.fecha === registro.fecha && a.nombre === registro.nombre && a.monto === registro.monto && a.guardadoEn === registro.guardadoEn);
+    const combinadoAnticipos = [...anticiposLocal, ...anticiposNube.filter(r => !yaExisteAnticipo(r))];
+    localStorage.setItem(ANTICIPOS_KEY, JSON.stringify(combinadoAnticipos));
+  } catch (err) {
+    // Sin internet o sin respuesta: seguimos con lo que ya hay guardado localmente.
+  }
 }
 
 function cambiarPerfil() {
-  if (!confirm('¿Cambiar de usuario? Tendrás que volver a escribir el nombre.')) return;
+  if (!confirm('¿Cambiar de usuario? Tendrás que volver a escribir tu nombre y PIN.')) return;
   localStorage.removeItem(PERFIL_KEY);
+  localStorage.removeItem(HISTORIAL_KEY);
+  localStorage.removeItem(ANTICIPOS_KEY);
   document.getElementById('setupNombre').value = '';
+  document.getElementById('setupPin').value = '';
   mostrarVista('vistaSetup');
 }
 
@@ -251,9 +320,23 @@ function guardarTurno() {
   const historial = agregarAlHistorial(leerHistorial(), registro);
   localStorage.setItem(HISTORIAL_KEY, JSON.stringify(historial));
 
+  sincronizarTurnoConNube(registro);
+
   alert('Turno guardado.');
   limpiarCamposTurno();
   cerrarEstadoActual();
+}
+
+function sincronizarTurnoConNube(registro) {
+  const perfil = leerPerfil();
+  if (!perfil) return;
+  fetch(VALE_APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ accion: 'guardarTurno', datos: { ...registro, pin: perfil.pin } }),
+  }).catch(() => {
+    // Sin internet: el turno ya quedó guardado localmente, se sincroniza después si se necesita.
+  });
 }
 
 function etiquetaResultado(resultadoFinal) {
@@ -328,14 +411,27 @@ function agregarAnticipo() {
   }
 
   const anticipos = leerAnticipos();
-  anticipos.unshift({ fecha, nombre, monto, concepto, guardadoEn: new Date().toISOString() });
+  const registro = { fecha, nombre, monto, concepto, guardadoEn: new Date().toISOString() };
+  anticipos.unshift(registro);
   localStorage.setItem(ANTICIPOS_KEY, JSON.stringify(anticipos));
+
+  sincronizarAnticipoConNube(registro);
 
   document.getElementById('anticipoNombre').value = '';
   document.getElementById('anticipoMonto').value = '';
   document.getElementById('anticipoConcepto').value = '';
 
   renderizarAnticipos();
+}
+
+function sincronizarAnticipoConNube(registro) {
+  fetch(VALE_APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ accion: 'guardarAnticipo', datos: registro }),
+  }).catch(() => {
+    // Sin internet: el anticipo ya quedó guardado localmente.
+  });
 }
 
 function eliminarAnticipo(indice) {

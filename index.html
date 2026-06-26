@@ -22,14 +22,19 @@
   <!-- Vista: registro de nombre (primera vez) -->
   <div id="vistaSetup" class="hidden">
     <section class="card">
-      <h2>¿Cómo te llamas?</h2>
-      <p class="hint">Regístrate una sola vez en este celular. Tu nombre quedará guardado para todos tus turnos y anticipos.</p>
+      <h2>Identifícate</h2>
+      <p class="hint">Tu nombre y PIN quedan guardados en la nube. Si la app se borra del celular, vuelve a entrar con los mismos datos y recuperas tu historial.</p>
       <div class="grid grid-2">
         <label>Nombre del despachador
           <input type="text" id="setupNombre" placeholder="Tu nombre">
         </label>
+        <label>PIN (4 dígitos)
+          <input type="password" inputmode="numeric" maxlength="4" id="setupPin" placeholder="••••">
+        </label>
       </div>
+      <p class="hint">Si es tu primera vez, ese PIN queda registrado a tu nombre. Si ya tenías cuenta, usa el mismo PIN de antes.</p>
       <button type="button" id="btnGuardarPerfil">Continuar</button>
+      <p id="setupEstado" class="hint"></p>
     </section>
   </div>
 
