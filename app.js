@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.25';
+const APP_VERSION = '3.26';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -274,8 +274,10 @@ function mostrarDashboard() {
   const sumaAnticipos = anticiposDelMes.reduce((total, a) => total + a.monto, 0);
   document.getElementById('dashAnticipos').textContent = formatoMoneda(sumaAnticipos);
 
-  const total = sumaSobraFalta + sumaAnticipos;
-  const { clase: claseTotal } = etiquetaResultado(total);
+  // Total a descontar al despachador: faltantes + anticipos (se le quitan) menos sobrantes (se le devuelven).
+  const total = sumaAnticipos - sumaSobraFalta;
+  let claseTotal = 'neutro';
+  if (Math.abs(total) >= 0.005) claseTotal = total > 0 ? 'negativo' : 'positivo';
   const totalEl = document.getElementById('dashTotal');
   totalEl.textContent = formatoMoneda(total);
   totalEl.classList.remove('positivo', 'negativo', 'neutro');
