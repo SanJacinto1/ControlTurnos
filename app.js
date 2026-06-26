@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.28';
+const APP_VERSION = '3.31';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -541,7 +541,7 @@ function construirTicketValeHTML(datos) {
   const fechaHora = new Date().toLocaleString('es-EC');
 
   const filas = datos.items.map(item =>
-    `<div class="detalle-item"><span>${item.descripcion}</span><span>$${item.valor.toFixed(2)}</span></div>`
+    `<div class="fila"><span>${item.descripcion}</span><span>$${item.valor.toFixed(2)}</span></div>`
   ).join('');
 
   return `
@@ -550,21 +550,21 @@ function construirTicketValeHTML(datos) {
       <meta charset="UTF-8">
       <title>Vale de caja</title>
       <style>
-        @page { margin: 3mm; }
+        @page { margin: 2mm; }
         html, body { margin: 0; padding: 0; }
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
         .ticket { width: 100%; }
-        .encabezado { text-align: center; border-bottom: 3px dashed #000; margin-bottom: 12px; padding-bottom: 10px; }
-        .encabezado h2 { margin: 0 0 6px; font-size: 74px; font-weight: normal; }
-        .encabezado p { margin: 0; font-size: 40px; }
-        .datos { margin-bottom: 30px; font-size: 49px; }
-        .datos div { padding: 5px 0; }
-        .detalle-item { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-size: 49px; }
-        .total { border-top: 3px solid #000; padding-top: 10px; margin-top: 10px; margin-bottom: 30px; font-size: 60px; }
-        .firma { margin-top: 26px; border-top: 1px dashed #000; padding-top: 12px; font-size: 43px; }
-        .firma .linea-firma { margin-top: 90px; margin-bottom: 30px; }
-        .elaborado-por { font-size: 56px; margin-top: 30px; }
-        .impreso { text-align: center; margin-top: 14px; font-size: 38px; }
+        .encabezado { text-align: center; border-bottom: 2px dashed #000; margin-bottom: 8px; padding-bottom: 6px; }
+        .encabezado h2 { margin: 0 0 3px; font-size: 26px; font-weight: bold; }
+        .encabezado p { margin: 0; font-size: 13px; }
+        .datos { margin-bottom: 10px; }
+        .dato-linea { padding: 4px 0; font-size: 16px; }
+        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 17px; }
+        .total { display: flex; justify-content: space-between; gap: 8px; border-top: 2px solid #000; padding: 8px 0 0; margin-top: 6px; font-size: 20px; font-weight: bold; }
+        .firma { margin-top: 18px; border-top: 1px dashed #000; padding-top: 8px; font-size: 13px; }
+        .firma .linea-firma { margin-top: 36px; margin-bottom: 10px; font-size: 13px; }
+        .elaborado-por { font-size: 16px; margin-top: 8px; }
+        .impreso { text-align: center; margin-top: 10px; font-size: 11px; }
       </style>
     </head>
     <body>
@@ -574,12 +574,12 @@ function construirTicketValeHTML(datos) {
           <p>DEBO Y PAGARE EL VALOR EXPRESADO EN ESTE DOCUMENTO A FASTGAS S.A.S.</p>
         </div>
         <div class="datos">
-          <div>Recibo: ${datos.numeroRecibo}</div>
-          <div>Fecha: ${fecha}</div>
-          <div>Cliente: ${datos.cliente}</div>
+          <div class="dato-linea">Recibo: ${datos.numeroRecibo}</div>
+          <div class="dato-linea">Fecha: ${fecha}</div>
+          <div class="dato-linea">Cliente: ${datos.cliente}</div>
         </div>
-        <div class="detalle">${filas}</div>
-        <div class="detalle-item total"><span>TOTAL:</span><span>$${datos.total.toFixed(2)}</span></div>
+        ${filas}
+        <div class="total"><span>TOTAL:</span><span>$${datos.total.toFixed(2)}</span></div>
         <div class="firma">
           <div>Firma:</div>
           <div class="linea-firma">_________________________</div>
@@ -736,14 +736,14 @@ function construirTicketHTML() {
       <meta charset="UTF-8">
       <title>Ticket de turno</title>
       <style>
-        @page { margin: 3mm; }
+        @page { margin: 2mm; }
         html, body { margin: 0; padding: 0; }
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
         .ticket { width: 100%; }
-        .linea { border-top: 3px dashed #000; margin: 14px 0; }
-        .fila { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; font-size: 49px; }
-        .resultado { text-align: center; margin-top: 20px; font-size: 60px; }
-        .pie { text-align: center; margin-top: 22px; font-size: 31px; }
+        .linea { border-top: 2px dashed #000; margin: 8px 0; }
+        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 17px; }
+        .resultado { text-align: center; margin-top: 12px; font-size: 26px; font-weight: bold; }
+        .pie { text-align: center; margin-top: 12px; font-size: 11px; }
       </style>
     </head>
     <body>
@@ -794,15 +794,15 @@ function construirTicketDetalleHTML(titulo, entradas, total) {
       <meta charset="UTF-8">
       <title>${titulo}</title>
       <style>
-        @page { margin: 3mm; }
+        @page { margin: 2mm; }
         html, body { margin: 0; padding: 0; }
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
         .ticket { width: 100%; }
-        .linea { border-top: 3px dashed #000; margin: 14px 0; }
-        .fila { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; font-size: 49px; }
-        .resultado { text-align: center; margin-top: 20px; font-size: 60px; }
-        .pie { text-align: center; margin-top: 22px; font-size: 31px; }
-        h2 { text-align: center; margin: 0 0 12px; font-size: 49px; font-weight: normal; }
+        .linea { border-top: 2px dashed #000; margin: 8px 0; }
+        .fila { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 17px; }
+        .resultado { text-align: center; margin-top: 12px; font-size: 26px; font-weight: bold; }
+        .pie { text-align: center; margin-top: 12px; font-size: 11px; }
+        h2 { text-align: center; margin: 0 0 8px; font-size: 22px; font-weight: bold; }
       </style>
     </head>
     <body>
