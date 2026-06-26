@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.22';
+const APP_VERSION = '3.23';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -451,21 +451,21 @@ function construirTicketValeHTML(datos) {
       <meta charset="UTF-8">
       <title>Vale de caja</title>
       <style>
-        @page { size: 72mm 115mm; margin: 0; }
-        html, body { margin: 0; padding: 0; width: 72mm; min-height: 0; }
+        @page { margin: 3mm; }
+        html, body { margin: 0; padding: 0; }
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
-        .ticket { width: 72mm; margin: 0; padding: 0; }
-        .encabezado { text-align: center; border-bottom: 1px dashed #000; margin: 0 0 3mm; padding: 0 0 2mm; }
-        .encabezado h2 { margin: 0; font-size: 18pt; line-height: 1; font-weight: normal; }
-        .encabezado p { margin: 1mm 0 0; font-size: 9pt; line-height: 1.05; }
-        .datos { margin-bottom: 3mm; font-size: 11pt; line-height: 1.1; }
-        .datos div { padding: 0.5mm 0; }
-        .detalle-item { display: flex; justify-content: space-between; gap: 4mm; padding: 1mm 0; font-size: 11pt; line-height: 1.1; }
-        .total { border-top: 1px solid #000; padding-top: 1.5mm; margin-top: 1mm; margin-bottom: 4mm; font-size: 14pt; }
-        .firma { margin-top: 3mm; border-top: 1px dashed #000; padding-top: 1.5mm; font-size: 10pt; }
-        .firma .linea-firma { margin-top: 12mm; margin-bottom: 2mm; }
-        .elaborado-por { font-size: 11pt; margin-top: 2mm; }
-        .impreso { text-align: center; margin-top: 2mm; font-size: 8pt; }
+        .ticket { width: 100%; }
+        .encabezado { text-align: center; border-bottom: 3px dashed #000; margin-bottom: 12px; padding-bottom: 10px; }
+        .encabezado h2 { margin: 0 0 6px; font-size: 74px; font-weight: normal; }
+        .encabezado p { margin: 0; font-size: 40px; }
+        .datos { margin-bottom: 30px; font-size: 49px; }
+        .datos div { padding: 5px 0; }
+        .detalle-item { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-size: 49px; }
+        .total { border-top: 3px solid #000; padding-top: 10px; margin-top: 10px; margin-bottom: 30px; font-size: 60px; }
+        .firma { margin-top: 26px; border-top: 1px dashed #000; padding-top: 12px; font-size: 43px; }
+        .firma .linea-firma { margin-top: 90px; margin-bottom: 30px; }
+        .elaborado-por { font-size: 56px; margin-top: 30px; }
+        .impreso { text-align: center; margin-top: 14px; font-size: 38px; }
       </style>
     </head>
     <body>
@@ -637,14 +637,14 @@ function construirTicketHTML() {
       <meta charset="UTF-8">
       <title>Ticket de turno</title>
       <style>
-        @page { size: 72mm 95mm; margin: 0; }
-        html, body { margin: 0; padding: 0; width: 72mm; min-height: 0; }
+        @page { margin: 3mm; }
+        html, body { margin: 0; padding: 0; }
         body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
-        .ticket { width: 72mm; margin: 0; padding: 0; }
-        .linea { border-top: 1px dashed #000; margin: 2mm 0; }
-        .fila { display: flex; justify-content: space-between; gap: 4mm; padding: 1mm 0; font-size: 11pt; line-height: 1.1; }
-        .resultado { text-align: center; margin-top: 3mm; font-size: 14pt; }
-        .pie { text-align: center; margin-top: 3mm; font-size: 8pt; }
+        .ticket { width: 100%; }
+        .linea { border-top: 3px dashed #000; margin: 14px 0; }
+        .fila { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; font-size: 49px; }
+        .resultado { text-align: center; margin-top: 20px; font-size: 60px; }
+        .pie { text-align: center; margin-top: 22px; font-size: 31px; }
       </style>
     </head>
     <body>
@@ -664,65 +664,17 @@ function construirTicketHTML() {
 }
 
 function imprimirHTML(htmlCompleto) {
+  const areaImpresion = document.getElementById('areaImpresion');
   const estiloMatch = htmlCompleto.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
   const cuerpoMatch = htmlCompleto.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-  const estiloTicket = estiloMatch ? estiloMatch[1] : '';
-  const cuerpoTicket = (cuerpoMatch ? cuerpoMatch[1] : htmlCompleto).replace(/<script[\s\S]*?<\/script>/gi, '');
-  const urlApp = window.location.href.split('#')[0];
+  const estilo = estiloMatch ? `<style>${estiloMatch[1]}</style>` : '';
+  let cuerpo = cuerpoMatch ? cuerpoMatch[1] : htmlCompleto;
+  cuerpo = cuerpo.replace(/<script[\s\S]*?<\/script>/gi, '');
 
-  const documentoImpresion = `
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Imprimir recibo</title>
-      <style>
-        ${estiloTicket}
-        @page { size: 72mm 115mm; margin: 0; }
-        html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; width: 72mm !important; min-height: 0 !important; }
-        body { min-height: 0 !important; }
-        .ticket { width: 72mm !important; margin: 0 !important; padding: 0 !important; }
-        @media print {
-          @page { size: 72mm 115mm; margin: 0; }
-          html, body { margin: 0 !important; padding: 0 !important; width: 72mm !important; height: auto !important; }
-          .ticket { break-after: avoid; page-break-after: avoid; }
-        }
-        .acciones-impresion { display: none; }
-        @media screen {
-          .acciones-impresion {
-            display: flex;
-            gap: 8px;
-            padding: 8px;
-            position: sticky;
-            top: 0;
-            background: #fff;
-            border-bottom: 1px solid #ddd;
-          }
-          .acciones-impresion button {
-            font: 16px Arial, sans-serif;
-            padding: 8px 10px;
-          }
-        }
-        @media print { .acciones-impresion { display: none !important; } }
-      </style>
-    </head>
-    <body>
-      <div class="acciones-impresion">
-        <button type="button" onclick="window.print()">Imprimir</button>
-        <button type="button" onclick="location.href='${urlApp}'">Volver</button>
-      </div>
-      ${cuerpoTicket}
-    </body>
-    </html>
-  `;
-
-  const blob = new Blob([documentoImpresion], { type: 'text/html' });
-  const blobUrl = URL.createObjectURL(blob);
-  const ventana = window.open(blobUrl, '_blank');
-  if (!ventana) {
-    window.location.href = blobUrl;
-  }
+  areaImpresion.innerHTML = estilo + cuerpo;
+  setTimeout(() => {
+    window.print();
+  }, 200);
 }
 
 function imprimirTurno() {
