@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.19';
+const APP_VERSION = '3.20';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -451,10 +451,9 @@ function construirTicketValeHTML(datos) {
       <meta charset="UTF-8">
       <title>Vale de caja</title>
       <style>
-        @page { size: 80mm auto; margin: 0; }
         html, body { margin: 0; padding: 0; }
-        body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; width: 80mm; }
-        .ticket { width: 80mm; margin: 0; padding: 0; }
+        body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
+        .ticket { width: 72mm; margin: 0; padding: 0; }
         .encabezado { text-align: center; border-bottom: 1px dashed #000; margin: 0 0 3mm; padding: 0 0 2mm; }
         .encabezado h2 { margin: 0; font-size: 18pt; line-height: 1; font-weight: normal; }
         .encabezado p { margin: 1mm 0 0; font-size: 9pt; line-height: 1.05; }
@@ -637,10 +636,9 @@ function construirTicketHTML() {
       <meta charset="UTF-8">
       <title>Ticket de turno</title>
       <style>
-        @page { size: 80mm auto; margin: 0; }
         html, body { margin: 0; padding: 0; }
-        body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; width: 80mm; }
-        .ticket { width: 80mm; margin: 0; padding: 0; }
+        body { font-family: Arial, Helvetica, sans-serif; font-weight: normal; color: #000; }
+        .ticket { width: 72mm; margin: 0; padding: 0; }
         .linea { border-top: 1px dashed #000; margin: 2mm 0; }
         .fila { display: flex; justify-content: space-between; gap: 4mm; padding: 1mm 0; font-size: 11pt; line-height: 1.1; }
         .resultado { text-align: center; margin-top: 3mm; font-size: 14pt; }
@@ -680,12 +678,11 @@ function imprimirHTML(htmlCompleto) {
       <title>Imprimir recibo</title>
       <style>
         ${estiloTicket}
-        @page { size: 80mm auto; margin: 0; }
         html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
-        body { width: 80mm !important; min-height: 0 !important; }
-        .ticket { width: 80mm !important; margin: 0 !important; padding: 0 !important; }
+        body { min-height: 0 !important; }
+        .ticket { width: 72mm !important; margin: 0 !important; padding: 0 !important; }
         @media print {
-          body { position: relative !important; top: -35mm !important; }
+          html, body { margin: 0 !important; padding: 0 !important; }
           .ticket { break-after: avoid; page-break-after: avoid; }
         }
         .acciones-impresion { display: none; }
