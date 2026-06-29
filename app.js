@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.33';
+const APP_VERSION = '3.34';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -89,6 +89,8 @@ function limpiarCamposTurno() {
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(DETALLE_TARJETAS_KEY);
   localStorage.removeItem(DETALLE_TRANSFERENCIAS_KEY);
+  turnoEditando = null;
+  document.getElementById('btnGuardar').textContent = 'Guardar turno';
   recalcular();
 }
 
@@ -304,6 +306,8 @@ function leerHistorial() {
   return guardado ? JSON.parse(guardado) : [];
 }
 
+let turnoEditando = null;
+
 function guardarTurno() {
   const datos = {
     fecha: document.getElementById('fecha').value,
@@ -319,13 +323,26 @@ function guardarTurno() {
   };
   const { resultadoFinal } = calcularTurno(datos);
 
-  const registro = { ...datos, resultadoFinal, guardadoEn: new Date().toISOString() };
-  const historial = agregarAlHistorial(leerHistorial(), registro);
-  localStorage.setItem(HISTORIAL_KEY, JSON.stringify(historial));
+  if (turnoEditando) {
+    const guardadoEnOriginal = turnoEditando.guardadoEn;
+    const registro = { ...datos, resultadoFinal, guardadoEn: guardadoEnOriginal };
+    const historial = leerHistorial().map(r => r.guardadoEn === guardadoEnOriginal ? registro : r);
+    localStorage.setItem(HISTORIAL_KEY, JSON.stringify(historial));
 
-  sincronizarTurnoConNube(registro);
+    sincronizarActualizacionTurno(registro, guardadoEnOriginal);
 
-  alert('Turno guardado.');
+    turnoEditando = null;
+    alert('Turno actualizado.');
+  } else {
+    const registro = { ...datos, resultadoFinal, guardadoEn: new Date().toISOString() };
+    const historial = agregarAlHistorial(leerHistorial(), registro);
+    localStorage.setItem(HISTORIAL_KEY, JSON.stringify(historial));
+
+    sincronizarTurnoConNube(registro);
+
+    alert('Turno guardado.');
+  }
+
   limpiarCamposTurno();
   cerrarEstadoActual();
 }
@@ -340,6 +357,43 @@ function sincronizarTurnoConNube(registro) {
   }).catch(() => {
     // Sin internet: el turno ya quedó guardado localmente, se sincroniza después si se necesita.
   });
+}
+
+function sincronizarActualizacionTurno(registro, guardadoEnOriginal) {
+  const perfil = leerPerfil();
+  if (!perfil) return;
+  fetch(VALE_APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ accion: 'actualizarTurno', datos: { ...registro, guardadoEnOriginal, pin: perfil.pin } }),
+  }).catch(() => {
+    // Sin internet: el cambio ya quedó guardado localmente, se sincroniza después si se necesita.
+  });
+}
+
+function esFechaDeHoy(fecha) {
+  return fecha === new Date().toISOString().slice(0, 10);
+}
+
+function editarTurno(guardadoEn) {
+  const registro = leerHistorial().find(r => r.guardadoEn === guardadoEn);
+  if (!registro) return;
+
+  turnoEditando = registro;
+  cerrarModalHistorial();
+  mostrarVistaTurno();
+  document.getElementById('btnGuardar').textContent = 'Actualizar turno';
+
+  document.getElementById('fecha').value = registro.fecha || '';
+  document.getElementById('turno').value = registro.turno || '';
+  document.getElementById('totalVentas').value = registro.totalVentas;
+  document.getElementById('efectivo').value = registro.efectivo;
+  document.getElementById('creditos').value = registro.creditos;
+  document.getElementById('tarjetas').value = registro.tarjetas;
+  document.getElementById('transferencias').value = registro.transferencias || 0;
+  document.getElementById('cheques').value = registro.cheques;
+  document.getElementById('ventaAceites').value = registro.ventaAceites;
+  recalcular();
 }
 
 function etiquetaResultado(resultadoFinal) {
@@ -366,6 +420,7 @@ function renderizarHistorialDelMes() {
     const fechaTexto = registro.fecha || '(sin fecha)';
     const turnoTexto = registro.turno || '(sin turno)';
     const nombreTexto = registro.nombre || '(sin nombre)';
+    const puedeEditar = esFechaDeHoy(registro.fecha) && registro.guardadoEn;
     return `
       <div class="historial-item">
         <div class="historial-encabezado">
@@ -373,9 +428,14 @@ function renderizarHistorialDelMes() {
           <span class="${clase}">${formatoMoneda(registro.resultadoFinal)} ${texto}</span>
         </div>
         <div class="historial-detalle">${nombreTexto} — Ventas: ${formatoMoneda(registro.totalVentas)}</div>
+        ${puedeEditar ? `<button type="button" class="btn-editar-turno btn-secundario" data-guardado-en="${registro.guardadoEn}">Editar</button>` : ''}
       </div>
     `;
   }).join('');
+
+  contenedor.querySelectorAll('.btn-editar-turno').forEach(boton => {
+    boton.addEventListener('click', () => editarTurno(boton.dataset.guardadoEn));
+  });
 
   const sumaMes = sumarResultados(registros);
   const { texto: textoMes } = etiquetaResultado(sumaMes);
