@@ -7,7 +7,7 @@ const PERFIL_KEY = 'control-turno-perfil';
 const DETALLE_TARJETAS_KEY = 'control-turno-detalle-tarjetas';
 const DETALLE_TRANSFERENCIAS_KEY = 'control-turno-detalle-transferencias';
 const UMBRAL_FALTANTE = -10;
-const APP_VERSION = '3.32';
+const APP_VERSION = '3.33';
 const VALE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby765C6gkVLFRmdwLvcQK-fahZ0LhXflUwotDV70SLA2-2stthVKByovOcfaze_Xje2/exec';
 
 const campos = ['fecha', 'turno', 'nombre', 'totalVentas', 'efectivo', 'creditos', 'tarjetas', 'transferencias', 'cheques', 'ventaAceites'];
@@ -557,13 +557,13 @@ function construirTicketValeHTML(datos) {
         .encabezado { text-align: center; border-bottom: 2px dashed #000; margin-bottom: 8px; padding-bottom: 6px; }
         .encabezado h2 { margin: 0 0 3px; font-size: 28px; font-weight: normal; }
         .encabezado p { margin: 0; font-size: 15px; }
-        .datos { margin-bottom: 10px; }
+        .datos { margin-top: 22px; margin-bottom: 10px; }
         .dato-linea { padding: 4px 0; font-size: 18px; }
         .fila { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 19px; }
-        .total { display: flex; justify-content: space-between; gap: 8px; border-top: 2px solid #000; padding: 8px 0 0; margin-top: 6px; font-size: 22px; font-weight: normal; }
+        .total { display: flex; justify-content: space-between; gap: 8px; border-top: 2px solid #000; padding: 8px 0 0; margin-top: 6px; margin-bottom: 26px; font-size: 22px; font-weight: normal; }
         .firma { margin-top: 18px; border-top: 1px dashed #000; padding-top: 8px; font-size: 15px; }
         .firma .linea-firma { margin-top: 36px; margin-bottom: 10px; font-size: 15px; }
-        .elaborado-por { font-size: 18px; margin-top: 8px; }
+        .elaborado-por { font-size: 18px; margin-top: 43px; }
         .impreso { text-align: center; margin-top: 10px; font-size: 13px; }
       </style>
     </head>
